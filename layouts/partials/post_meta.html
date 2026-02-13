@@ -1,0 +1,1 @@
+{{ with .Params.categories }} <div class="post-categories"> {{ range . }} <a class="category-badge" href="{{ "categories/" | relLangURL }}{{ . | urlize }}/"> {{ . }} </a> {{ end }} </div> {{ end }}
