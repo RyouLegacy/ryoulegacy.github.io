@@ -1,0 +1,39 @@
+/* Custom styles added to demo */
+
+:root {
+    --primary: #00c2ff;
+}
+
+.twitter-tweet {
+    margin: auto;
+}
+
+iframe {
+    border-radius: var(--radius) !important;
+}
+
+.home-info ul {
+    padding-inline-start: 20px;
+}
+
+.entry-cover img {
+    border: 1px solid var(--border);
+}
+
+.post-categories {
+    margin-top: 10px;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    margin-right: 6px;
+    border-radius: 8px;
+    background: var(--code-bg);
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.category-badge:hover {
+    opacity: 0.8;
+}
