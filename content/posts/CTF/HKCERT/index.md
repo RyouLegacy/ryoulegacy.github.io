@@ -1,21 +1,21 @@
 ---
 title: "HKCERT"
 date: 2026-02-14
-draft: false
-categories: ["Reverse"]
+draft: true
+categories: ["Reverse", "Crypto"]
 ---
 
 # Findkey
 
-Ở đoạn mã assembly của bài này nó đã bị làm rối luồng thực thi, sử dụng nhiều junk codes cũng như switch case, tuy nhiên ở pseudocode IDA đã làm khá tốt khi đã làm phẳng code flow
+Ở đoạn mã assembly của bài này nó đã bị làm rối, sử dụng nhiều junk codes cũng như switch case, tuy nhiên ở pseudocode IDA đã làm khá tốt khi đã làm phẳng code flow
 
-Bài này còn bị làm rối bởi những công thức toán học phức tạp và vô nghĩa ví dụ như
+Bài này còn bị làm rối bằng toán như
 ![image](first.png)
 
 
-Tuy nhiên em nhận ra là những con số này chắc chắn là hằng số vì vậy em có thể đặt breakpoint ngay tại những ví trí quan trọng như index của mảng. Khi đọc mã assembly thì đoạn công thức toán rối đó sẽ được lưu vào thanh ghi nào đó sau đó sẽ được sử dụng dưới mục đích index của mảng hay của vòng lập. Vì vậy em có thể tìm ra xu hướng thay đổi của nó
+Tuy nhiên mình nhận ra là những con số này chắc chắn là hằng số vì vậy mình có thể đặt breakpoint ngay tại những ví trí quan trọng như index của mảng. Khi đọc mã assembly thì đoạn công thức toán rối đó sẽ được lưu vào thanh ghi nào đó sau đó sẽ được sử dụng dưới mục đích index của mảng hay của vòng lập. Vì vậy mình có thể tìm ra xu hướng thay đổi của nó
 
-Script để xem xét của em:
+Script
 ```python 
 #!/home/ryou/.venvs/re/bin/python
 from pwn import *
@@ -64,7 +64,7 @@ while (counter := counter - 1) >= 0:
 print()
 p.close()
 ```
-Khi em muốn xem giá trị của 1 cái gì đấy thì chỉ cần chỉnh lại breakpoint và thêm số lần muốn xem lại giá trị đấy là được
+Khi mình muốn xem giá trị của 1 cái gì đấy thì chỉ cần chỉnh lại breakpoint và thêm số lần muốn xem lại giá trị đấy là được
 
 ```C
 // The function seems has been flattened
@@ -179,7 +179,7 @@ int __fastcall main(int argc, const char **argv, const char **envp)
 ............
 }
 ```
-Ở đây thì em thấy đã có plaintext và expected data rồi, việc của em là đi reverse hàm `is_this_enc` để coi thử logic của nó là gì
+Ở đây thì mình thấy đã có plaintext và expected data rồi, việc của mình là đi reverse hàm `is_this_enc` để coi thử logic của nó là gì
 
 ```C
 // The function seems has been flattened
@@ -417,11 +417,11 @@ _QWORD *__fastcall is_this_enc(_QWORD *p_plaintext, _QWORD *p_arg_dest, __int64 
   return dest_3;
 }
 ```
-Sau khi dùng script để tìm index thì em nhận thấy những vòng lặp nó chỉ đơn giản là tăng dần tới 1 lúc nào đó thì sẽ break như for bình thường nó chỉ làm rối code hơn thôi. Và còn vài chổ khác nữa như nói chung là giá trị của nó khá là cố định và đơn giản chỉ có phép toán phức tạp
+Sau khi dùng script để tìm index thì mình nhận thấy những vòng lặp nó chỉ đơn giản là tăng dần tới 1 lúc nào đó thì sẽ break như for bình thường nó chỉ làm rối code hơn thôi. Và còn vài chổ khác nữa như nói chung là giá trị của nó khá là cố định và đơn giản chỉ có phép toán phức tạp
 
-Sau khi áp dụng script trace giá trị thì em đã thấy nó khá giống AES-128bits key nhưng vì sợ nó có modify hay gì đó nên em đã quyết định reverse lại toàn bộ
+Sau khi áp dụng script trace giá trị thì mình đã thấy nó khá giống AES-128bits key nhưng vì sợ nó có modify hay gì đó nên mình đã quyết định reverse lại toàn bộ
 
-Đây là script mô phỏng lại toàn bộ hành vi của chương trình của em
+Đây là script mô phỏng lại toàn bộ hành vi của chương trình của mình
 
 ```python 
 #!/home/ryou/.venvs/re/bin/python
@@ -763,7 +763,7 @@ Pattern của bài:
 2. Biến state sẽ được lưu trên stack tại vị trí [rbp - 436] và [rbp - 444] là biến nhớ tạm
 3. Mỗi block code chính sẽ chỉnh state để dispatcher xác định flow tiếp theo
 4. Pattern để chọn flow
-    ![image](https://hackmd.io/_uploads/r1ClUM_VZe.png)
+    ![image](second.png)
 5. Các giá trị State thì nó được làm rối theo kiểu toán học tức là dùng những phép tính toán phức tạp để tính toán block tiếp theo cần được thực thi
 
 Để gỡ rối được thì nhiệm vụcủa chúng ta là cần phải xác định giá trị của [rbp - 444] ở mỗi state sau đó patch jump thẳng trực tiếp tới flow cần thiết luôn.
