@@ -1,0 +1,52 @@
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const paletteBtn = document.getElementById('palette-toggle');
+    const gadget = document.getElementById('theme-gadget');
+    const slider = document.getElementById('tg-slider');
+    const valueDisplay = document.getElementById('tg-value');
+    const resetButton = document.getElementById('tg-reset');
+    const root = document.documentElement;
+
+    // Toggle dropdown open/close
+    paletteBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        gadget.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking anywhere else
+    document.addEventListener('click', (e) => {
+        if (!gadget.contains(e.target)) {
+            gadget.classList.remove('show');
+        }
+    });
+
+    // Function to apply the color
+    const updateTheme = (hue) => {
+        const newColor = `hsl(${hue}, 80%, 65%)`; 
+        root.style.setProperty('--primary', newColor);
+        valueDisplay.textContent = hue;
+        localStorage.setItem('custom-theme-hue', hue);
+    };
+
+    // Check saved color on load
+    const savedHue = localStorage.getItem('custom-theme-hue');
+    if (savedHue !== null) {
+        slider.value = savedHue;
+        updateTheme(savedHue);
+    }
+
+    // Live update on slider drag
+    slider.addEventListener('input', (e) => {
+        updateTheme(e.target.value);
+    });
+
+    // Reset button
+    resetButton.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        root.style.removeProperty('--primary');
+        localStorage.removeItem('custom-theme-hue');
+        slider.value = 0;
+        valueDisplay.textContent = '0';
+    });
+});
+</script>

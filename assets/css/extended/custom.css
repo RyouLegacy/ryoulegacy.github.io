@@ -1,7 +1,25 @@
 /* Custom styles added to demo */
 
-:root {
+/* :root {
     --primary: #00c2ff;
+} */
+
+
+/* --- CUSTOM CURSOR --- */
+
+/* Default cursor */
+*, *::before, *::after {
+    cursor: url('imgs/avatar.jpg') 0 0, auto !important;
+}
+
+/* Pointer cursor (links, buttons) */
+a, button, [role="button"], input[type="submit"], label {
+    cursor: url('imgs/avatar.jpg') 0 0, pointer !important;
+}
+
+/* Text cursor */
+p, span, h1, h2, h3, h4, h5, h6, li, input, textarea {
+    cursor: url('imgs/avatar.jpg') 0 0, text !important;
 }
 
 .twitter-tweet {
@@ -38,3 +56,519 @@ iframe {
     opacity: 0.8;
 }
 
+/* Custom Toc CSS */
+/* Container for all meta elements */
+.custom-post-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Space between top and bottom rows */
+    margin: 10px 0 20px 0;
+}
+
+/* Individual rows */
+.meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+}
+
+/* Top row items (Words, Time) */
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--primary); /* Automatically flips: White in Dark mode, Dark Gray in Light mode */
+    background: var(--tertiary); /* Automatically flips the background box color */
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+/* Bottom row badges (Date, Category, Tags) */
+.meta-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--tertiary); /* Automatically flips the background box color */
+    color: var(--primary); /* Automatically flips: White in Dark mode, Dark Gray in Light mode */
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Make SVG icons inherit the adaptive text color */
+.meta-badge svg {
+    color: currentColor; 
+}
+
+/* Link styling inside badges */
+.meta-badge a {
+    color: inherit;
+    text-decoration: none;
+    box-shadow: none; /* overrides default papermod link styling */
+}
+
+/* Hover effect */
+.meta-badge a:hover {
+    opacity: 0.7; 
+}
+
+/* Separator for multiple tags ( / ) */
+.tag-sep {
+    margin: 0 4px;
+    opacity: 0.4;
+}
+
+
+
+/* Meta Layout Containers */
+.custom-meta-top, .custom-meta-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+}
+
+.custom-meta-top {
+    margin-bottom: 12px;
+}
+
+.custom-meta-bottom {
+    margin-top: 12px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed var(--tertiary); /* Faint line below metadata */
+    margin-bottom: 30px;
+}
+
+/* Post Title Styling (The Primary Color Vertical Line) */
+.post-header .custom-title {
+    border-left: 4px solid var(--primary); /* Adapts to theme primary color */
+    padding-left: 14px;
+    margin: 10px 0;
+    line-height: 1.2;
+}
+
+/* Badge Items Styling */
+.meta-item, .meta-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--tertiary); /* Adapts to PaperMod backgrounds */
+    color: var(--secondary); /* Adapts to PaperMod secondary text */
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Force icons inside badges to match the primary theme color */
+.meta-item svg, .meta-badge svg {
+    color: var(--primary); 
+}
+
+/* Tag specific styling */
+.meta-badge a {
+    color: inherit;
+    text-decoration: none;
+    box-shadow: none;
+}
+
+.meta-badge a:hover {
+    color: var(--primary);
+}
+
+.tag-sep {
+    margin: 0 4px;
+    opacity: 0.4;
+}
+
+.hash-symbol {
+    opacity: 0.6;
+    margin-right: 2px;
+}
+
+
+/* --- Corrected Theme Color Gadget Dropdown Styling --- */
+
+.theme-gadget {
+    position: absolute;
+    top: calc(100% + 15px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    
+    /* FIX: Changed from #1a1516 to a neutral dark charcoal */
+    background-color: #161616 !important; 
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Soft border for definition */
+    border-radius: 16px; 
+    width: 300px; 
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    font-family: inherit;
+    
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important; 
+    padding: 16px !important; 
+    box-sizing: border-box !important;
+    
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.theme-gadget::before {
+    display: none !important;
+}
+
+.theme-gadget.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Header layout fixes */
+.tg-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Forces the Reset button and Number box onto the same line */
+.tg-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+.tg-title {
+    color: #ffffff !important; /* Static White */
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+}
+
+.tg-line {
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background-color: var(--primary); /* Accent line follows theme */
+    border-radius: 4px;
+}
+
+/* Fixed dimensions & Static Colors */
+.tg-reset, .tg-value {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important; /* Static White */
+    border: none;
+    border-radius: 8px;
+    height: 30px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s ease;
+}
+
+.tg-reset {
+    cursor: pointer;
+    width: 30px;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.tg-reset:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+}
+
+.tg-value {
+    padding: 0 16px !important;
+    min-width: 40px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-sizing: border-box;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* --- THE FAT SLIDER --- */
+.tg-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 24px !important;
+    border-radius: 12px;
+    background: linear-gradient(to right,
+        hsl(0, 75%, 65%), hsl(60, 75%, 65%), hsl(120, 75%, 65%),
+        hsl(180, 75%, 65%), hsl(240, 75%, 65%), hsl(300, 75%, 65%), hsl(360, 75%, 65%)
+    );
+    outline: none;
+    margin: 0 !important;
+}
+
+.tg-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 18px;
+    background: #ffffff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+
+
+/* --- NEXT --- */
+/* --- NEXT --- */
+/* --- NEXT --- */
+
+.nav a,
+.nav a:hover,
+.nav a:focus,
+.nav a:active,
+.nav a:visited,
+#menu a,
+#menu a:hover,
+#menu a:focus,
+#menu a:active,
+#menu a:visited,
+#menu li a,
+#menu li a:hover,
+#menu li a:focus,
+#menu li.active > a,
+header nav a,
+header nav a:hover,
+header nav a:focus {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    -webkit-text-decoration: none !important;
+}
+
+/* PaperMod's specific active link selector (confirmed in their source) */
+.menu a.active,
+.menu a[aria-current],
+.menu a[aria-current="page"],
+.menu a[aria-current="true"],
+#menu .active,
+#menu [aria-current="page"] {
+    color: var(--primary) !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+
+/* --- NEXT --- */
+/* --- NEXT --- */
+/* --- NEXT --- */
+/* ============================================
+   NAVIGATION — Theme-Synced
+   Uses only PaperMod's own CSS variables.
+   No hardcoded dark/light colors — it just
+   follows whatever the page theme is doing.
+   ============================================ */
+
+/* --- HEADER --- */
+header.header {
+    background: color-mix(in srgb, var(--theme) 80%, transparent) !important;
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+/* --- LOGO --- */
+.logo a,
+.logo span {
+    font-family: 'Comfortaa', cursive !important;
+    font-size: 1.3rem !important;
+    font-weight: 700 !important;
+    color: var(--primary) !important;
+    letter-spacing: 0px;
+    text-decoration: none !important;
+    transition: opacity 0.25s ease;
+}
+
+.logo a:hover {
+    opacity: 0.7;
+    color: var(--primary) !important;
+}
+
+/* --- NAV MENU LINKS --- */
+.nav ul,
+#menu {
+    display: flex;
+    align-items: center;
+    gap: 2px !important;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Constrain the li so it doesn't stretch full header height */
+.nav ul li,
+#menu li {
+    display: flex;
+    align-items: center;
+}
+
+.nav a,
+#menu a {
+    font-family: 'Nunito', sans-serif !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.4px !important;
+    text-transform: uppercase !important;
+    color: var(--primary) !important;
+    opacity: 0.85;
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    padding: 6px 14px !important;
+    border-radius: 6px;
+    align-self: center;
+    display: inline-flex !important;
+    align-items: center;
+    line-height: 1.4;
+    position: relative;
+    transition: color 0.25s ease, background-color 0.25s ease;
+}
+
+/* Hover */
+.nav a:hover,
+#menu a:hover {
+    color: var(--primary) !important;
+    opacity: 1;
+    background-color: var(--tertiary) !important;
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+/* Active / current page */
+.nav a.active,
+#menu a.active,
+#menu a[aria-current="page"],
+.nav li.active a,
+#menu li.active a,
+.menu a.active,
+.menu a[aria-current="page"],
+.menu a[aria-current="true"] {
+    color: var(--primary) !important;
+    opacity: 1;
+    font-weight: 700 !important;
+    background-color: transparent !important;
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+/* Kill underline on all pseudo-states */
+.nav a:hover, .nav a:focus, .nav a:active, .nav a:visited,
+#menu a:hover, #menu a:focus, #menu a:active, #menu a:visited {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* --- ICON BUTTONS (palette + sun) --- */
+#theme-toggle,
+button[title],
+.theme-btn {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border-radius: 9px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: var(--tertiary) !important;  /* Auto-flips with theme */
+    border: 1px solid var(--border) !important;
+    color: var(--secondary) !important;
+    cursor: pointer;
+    transition:
+        background   0.25s ease,
+        border-color 0.25s ease,
+        color        0.25s ease,
+        transform    0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#theme-toggle:hover,
+button[title]:hover,
+.theme-btn:hover {
+    background: var(--code-bg) !important;
+    color: var(--primary) !important;
+    transform: scale(1.08) rotate(8deg);
+}
+
+#theme-toggle:active,
+button[title]:active {
+    transform: scale(0.88);
+    transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth release back to normal after click */
+#theme-toggle,
+button[title],
+.theme-btn {
+    transform-origin: center;
+}
+
+/* Nav link click press */
+.nav a:active,
+#menu a:active {
+    transform: scale(0.95);
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), color 0.1s ease, background-color 0.1s ease;
+    opacity: 0.8;
+}
+
+#theme-toggle svg {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#theme-toggle:hover svg {
+    transform: rotate(30deg);
+}
+
+header button svg,
+header svg {
+    width: 15px !important;
+    height: 15px !important;
+}
+
+/* --- ICONS ROW --- */
+.nav .icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* --- MOBILE --- */
+@media (max-width: 768px) {
+    .nav a,
+    #menu a {
+        font-size: 0.78rem !important;
+        padding: 4px 7px;
+        letter-spacing: 0.3px !important;
+    }
+
+    .logo a {
+        font-size: 1.15rem !important;
+    }
+}

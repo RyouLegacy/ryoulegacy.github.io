@@ -1,25 +1,49 @@
-{{- $scratch := newScratch }}
+<div class="custom-post-meta">
+  
+  <div class="meta-row top-meta">
+    {{- if (.Param "ShowWordCount") -}}
+    <span class="meta-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+      {{- i18n "words" .WordCount | default (printf "%d words" .WordCount) -}}
+    </span>
+    {{- end }}
 
-{{- if not .Date.IsZero -}}
-{{- $scratch.Add "meta" (slice (printf "<span title='%s'>%s</span>" (.Date) (.Date | time.Format (default ":date_long" site.Params.DateFormat)))) }}
-{{- end }}
+    {{- if (.Param "ShowReadingTime") -}}
+    <span class="meta-item">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      {{- i18n "read_time" .ReadingTime | default (printf "%d minutes" .ReadingTime) -}}
+    </span>
+    {{- end }}
+  </div>
 
-{{- if (.Param "ShowReadingTime") -}}
-{{- $scratch.Add "meta" (slice (printf "<span>%s</span>" (i18n "read_time" .ReadingTime | default (printf "%d min" .ReadingTime)))) }}
-{{- end }}
+  <div class="meta-row bottom-meta">
+    
+    {{- if not .Date.IsZero -}}
+    <span class="meta-badge date-badge" title="{{ .Date }}">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      {{- .Date.Format "2006-01-08" -}}
+    </span>
+    {{- end }}
 
-{{- if (.Param "ShowWordCount") -}}
-{{- $scratch.Add "meta" (slice (printf "<span>%s</span>" (i18n "words" .WordCount | default (printf "%d words" .WordCount)))) }}
-{{- end }}
+    {{- with .Params.categories -}}
+    {{- range . -}}
+    <a class="meta-badge cat-badge" href="{{ "categories/" | relLangURL }}{{ . | urlize }}/">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      {{- . -}}
+    </a>
+    {{- end -}}
+    {{- end -}}
 
-{{- if not (.Param "hideAuthor") -}}
-{{- with (partial "author.html" .) }}
-{{- $scratch.Add "meta" (slice (printf "<span>%s</span>" .)) }}
-{{- end }}
-{{- end }}
+    {{- with .Params.tags -}}
+    <div class="meta-badge tag-badge">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></svg>
+      {{- $len := len . -}}
+      {{- range $index, $tag := . -}}
+        <a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}/">{{ . }}</a>
+        {{- if ne (add $index 1) $len }}<span class="tag-sep">/</span>{{ end -}}
+      {{- end -}}
+    </div>
+    {{- end -}}
 
-{{- with ($scratch.Get "meta") }}
-{{- delimit . "&nbsp;·&nbsp;" | safeHTML -}}
-{{- end -}}
-
-{{ with .Params.categories }} <div class="post-categories"> {{ range . }} <a class="category-badge" href="{{ "categories/" | relLangURL }}{{ . | urlize }}/"> {{ . }} </a> {{ end }} </div> {{ end }}
+  </div>
+</div>

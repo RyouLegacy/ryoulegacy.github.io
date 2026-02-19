@@ -17,8 +17,10 @@ outputs:
     - RSS
     - JSON
 
+# 1. ADDED 'tag: tags' HERE
 taxonomies:
   category: categories
+  tag: tags
 
 menu:
   main:
@@ -31,13 +33,18 @@ menu:
     - name: Categories
       url: /categories/
       weight: 4
+    # 2. ADDED TAGS MENU ITEM HERE
+    - name: Tags
+      url: /tags/
+      weight: 5
 
 params:
   env: production
-  description: "CTF | Reverse Engineering | Pwn"
   author: "Trần Anh Thi"
 
   math: true
+
+  UseHugoToc: false
 
   ShowRelatedPosts: true
   related:
@@ -57,6 +64,7 @@ params:
   ShowAllPagesInArchive: true
   ShowRssButtonInSectionTermList: false
 
+  # These are already correctly set!
   ShowTags: true
   ShowPostMeta: true
   ShowCategories: true
@@ -64,17 +72,16 @@ params:
   profileMode:
     enabled: True
     title: "Ryou"
-    subtitle: "Reverse Engineering • Binary Exploitation"
-    imageUrl: "imgs/avatar.jpg"
+    subtitle: "A Rookie Reverse Engineer"
+    imageUrl: "imgs/avatar1.jpg"
     imageTitle: "Ryou"
-    imageWidth: 120
-    imageHeight: 120
+    imageWidth: 150
+    imageHeight: 150
     buttons:
       - name: Posts
         url: /posts/
       - name: Archives
         url: /archives/
-
 
   socialIcons:
     - name: github
