@@ -1,6 +1,6 @@
 ---
 title: "About me"
-date: 2026-02-13
+date: 2025-09-09
 draft: false
 categories: ["General"]
 ---

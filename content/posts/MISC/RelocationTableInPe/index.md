@@ -3,6 +3,7 @@ title: "Relocation Table In PE"
 date: 2026-02-14
 draft: false
 categories: ["Reverse"]
+tags: ["PE"]
 ---
 
 __Prolouge__: The purpose of this page is to describe what is Relocation in Window PE and analyze Relocation Table in Window PE!
@@ -110,7 +111,6 @@ dump_reloc_address(api.get_imagebase())
 
 You can open abitrary EXE/DLL file on your window computer or download on the internet and load it into IDA and use this script for testing.
 
->[!Note]
-If you found any misleading knowledge or something about my understanding, please comment I will fix it!
+>If you found any misleading knowledge or something about my understanding, please comment I will fix it!
 
 

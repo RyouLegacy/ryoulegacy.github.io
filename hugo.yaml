@@ -24,17 +24,17 @@ taxonomies:
 
 menu:
   main:
-    - name: Archive
-      url: /archives/
+    - name: Posts
+      url: /posts/
       weight: 1
     - name: Search
       url: /search/
-      weight: 2
-    - name: Categories
+      weight: 3
+    - name: Category
       url: /categories/
       weight: 4
     # 2. ADDED TAGS MENU ITEM HERE
-    - name: Tags
+    - name: Tag
       url: /tags/
       weight: 5
 
@@ -78,9 +78,9 @@ params:
     imageWidth: 150
     imageHeight: 150
     buttons:
-      - name: Posts
-        url: /posts/
-      - name: Archives
+      # - name: Posts
+      #   url: /posts/
+      - name: Archived Posts
         url: /archives/
 
   socialIcons:
