@@ -71,10 +71,10 @@ params:
 
   profileMode:
     enabled: True
-    title: "Ryou"
+    title: "ryou"
     subtitle: "A Rookie Reverse Engineer"
-    imageUrl: "imgs/avatar1.jpg"
-    imageTitle: "Ryou"
+    imageUrl: "imgs/cattt.png"
+    imageTitle: "ryou"
     imageWidth: 150
     imageHeight: 150
     buttons:

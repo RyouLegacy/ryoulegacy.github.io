@@ -1,7 +1,7 @@
 ---
 title: "Relocation Table In PE"
 date: 2026-02-14
-draft: false
+draft: true
 categories: ["Reverse"]
 tags: ["PE"]
 ---
