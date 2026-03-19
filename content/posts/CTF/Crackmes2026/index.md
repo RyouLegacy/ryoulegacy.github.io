@@ -1,14 +1,14 @@
 ---
 title: "Crackmes.one RE CTF 2026"
 date: 2026-03-17
-draft: true
+draft: false
 categories: ["Reverse"]
 tags: ["Obfuscated"]
 ---
 
-## Short discussion about Crackme9 in the Crackmes.one RE CTF challenge
+## Discussion Crackme9
 
-Prologue: I was not able to solve this challenge during the contest (I upsolved it later after searching and reading other player writeup) so I would not confirm this blog is a complete writeup for the whole challenge, just my raw note about this fantasting obfuscator used in this program.
+__Prologue:__ This is just my short discussion about this challenge. I was not able to solve this challenge during the contest (I upsolved it later after searching and reading other player writeup) so I would not confirm this blog is a complete writeup for the whole challenge, just my raw note about this fantasting obfuscator used in this program.
 
 Basically the challenge was about to analyze the logic of the serial checker, the binary is obfuscated by the technique called [Nanomites](https://github.com/Fatmike-GH/Nanomites), Dynamic API Resolution, API Hashing with many small anti-debugging and anti-disassembly techniques. I would not dive deeply into how to reverse this binary, my main focus is the obfuscator itself and other interesting anti-reversing technique
 

@@ -38,7 +38,6 @@
     
     {{- if not (.Param "hideMeta") }}
     <div class="post-meta custom-meta-bottom">
-      
       {{- if not .Date.IsZero -}}
       <span class="meta-badge date-badge" title="{{ .Date }}">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
@@ -116,21 +115,35 @@
     {{- end }}
 
   </header>
-  
+
   {{- $isHidden := (.Param "cover.hiddenInSingle") | default (.Param "cover.hidden") | default false }}
   {{- partial "cover.html" (dict "cxt" . "IsSingle" true "isHidden" $isHidden) }}
-  
-  {{- if (.Param "ShowToc") }}
-  {{- partial "toc.html" . }}
-  {{- end }}
 
-  {{- if .Content }}
-  <div class="post-content">
-    {{- if not (.Param "disableAnchoredHeadings") }}
-    {{- partial "anchored_headings.html" .Content -}}
-    {{- else }}{{ .Content }}{{ end }}
+  {{/* ── 3-column grid: [left gutter | content | right gutter] ── */}}
+  <div class="post-with-toc">
+
+    {{/* TOC lives in the LEFT gutter — col 1 */}}
+    {{- if (.Param "ShowToc") }}
+    <aside class="toc-sidebar">
+      <div class="toc-sticky">
+        <h3>Table of Contents</h3>
+        {{ .TableOfContents }}
+      </div>
+    </aside>
+    {{- end }}
+
+    {{/* Content lives in the CENTER column — col 2 */}}
+    {{- if .Content }}
+    <div class="post-body">
+      <div class="post-content">
+        {{- if not (.Param "disableAnchoredHeadings") }}
+        {{- partial "anchored_headings.html" .Content -}}
+        {{- else }}{{ .Content }}{{ end }}
+      </div>
+    </div>
+    {{- end }}
+
   </div>
-  {{- end }}
 
   <footer class="post-footer">
     {{- $tags := .Language.Params.Taxonomies.tag | default "tags" }}

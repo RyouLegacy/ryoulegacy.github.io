@@ -44,7 +44,11 @@ params:
 
   math: true
 
-  UseHugoToc: false
+  # UseHugoToc: false
+  # ShowToc: true
+
+  ShowToc: true
+  TocOpen: false  # doesn't matter anymore but set it anyway
 
   ShowRelatedPosts: true
   related:
@@ -55,12 +59,18 @@ params:
   defaultTheme: dark
   disableThemeToggle: false
 
+  assets:
+    favicon: "/favicon.ico"
+    favicon16x16: "/favicon-16x16.png"
+    favicon32x32: "/favicon-32x32.png"
+    apple_touch_icon: "/apple-touch-icon.png"
+
   ShowReadingTime: true
   ShowShareButtons: false
   ShowPostNavLinks: true
   ShowBreadCrumbs: true
   ShowCodeCopyButtons: true
-  ShowToc: true
+
   ShowAllPagesInArchive: true
   ShowRssButtonInSectionTermList: false
 
@@ -100,3 +110,7 @@ markup:
   tableOfContents:
     startLevel: 2
     endLevel: 4
+  # tableOfContents:
+  #   startLevel: 1
+  #   endLevel: 4
+  #   ordered: false

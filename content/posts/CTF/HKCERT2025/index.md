@@ -8,6 +8,7 @@ tags: ["Obfuscated"]
 
 # Findkey
 
+## Analyze
 Ở đoạn mã assembly của bài này nó đã bị làm rối, sử dụng nhiều junk codes cũng như switch case, tuy nhiên ở pseudocode IDA đã làm khá tốt khi đã làm phẳng code flow
 
 Bài này còn bị làm rối bằng toán như
@@ -757,7 +758,7 @@ Flag: flag{8579432268}
 
 ---
 
-### Update: 
+## Update 
 Ở bài này có obfuscate CFF để làm rối
 Pattern của bài:
 1. Đầu tiên là các đoạn code chính sẽ nằm trong cùng một block

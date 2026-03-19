@@ -254,13 +254,15 @@ header svg {
 .meta-badge {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background-color: var(--tertiary);
+    gap: 5px;
+    background-color: transparent;
     color: var(--secondary);
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 0.5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 400;
+    font-size: 0.8rem;
 }
 
 .meta-item svg,
@@ -486,101 +488,116 @@ iframe {
 }
 
 
-/*
-6. COLLASPE 
-*/
-/* ── Collapse Block ───────────────────────────────────────── */
+/* 6. COLLAPSE
+   ========================================================== */
+
 .collapse-block {
-  margin: 1.5rem 0;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--entry);   /* ← add this */
+    margin: 1.5rem 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--entry);
 }
 
-/* ── Summary row ──────────────────────────────────────────── */
 .collapse-summary {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.75rem 1.1rem;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--primary);
-  list-style: none;
-  user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.1rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary);
+    list-style: none;
+    user-select: none;
 }
 
 .collapse-summary::-webkit-details-marker { display: none; }
 
-/* ── Divider when open ────────────────────────────────────── */
 details[open] .collapse-summary {
-  border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
 }
 
-/* ── Chevron ──────────────────────────────────────────────── */
 .collapse-icon {
-  display: inline-block;
-  width: 0.45rem;
-  height: 0.45rem;
-  border-right: 2px solid var(--primary);
-  border-bottom: 2px solid var(--primary);
-  transform: rotate(-45deg);
-  transition: transform 0.25s ease;
-  flex-shrink: 0;
-  margin-top: 2px;
+    display: inline-block;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-right: 2px solid var(--primary);
+    border-bottom: 2px solid var(--primary);
+    transform: rotate(-45deg);
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+    margin-top: 2px;
 }
 
 details[open] .collapse-icon {
-  transform: rotate(45deg);
+    transform: rotate(45deg);
 }
 
-/* ── Smooth open/close ────────────────────────────────────── */
 .collapse-content {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.3s ease;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 details[open] .collapse-content {
-  grid-template-rows: 1fr;
+    grid-template-rows: 1fr;
 }
 
 .collapse-content > div {
-  overflow: hidden;
+    overflow: hidden;
+    min-height: 0;
 }
 
-/* ── Remove inner highlight margin so it sits flush ──────── */
 .collapse-block .highlight {
-  margin: 0;
+    margin: 0;
 }
 
-/* ── Smooth open/close ────────────────────────────────────── */
-.collapse-content {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.7s cubic-bezier(0.4, 0, 0.2, 1);  /* 0.35s → 0.7s */
-}
 
-details[open] .collapse-content {
-  grid-template-rows: 1fr;
-}
-
-.collapse-content > div {
-  overflow: hidden;
-  min-height: 0;   /* ← this is the missing piece */
-}
-
-/*
-7. NAVIGATION FOOTER
-*/
+/* 7. NAVIGATION FOOTER
+   ========================================================== */
 
 .paginav-header {
     margin: 1.5rem 0 0 !important;
 }
 
-/* remove the left border accent on the title when centered */
+.paginav .prev {
+    justify-content: flex-start !important;
+}
+
+.paginav .next {
+    justify-content: flex-end !important;
+}
+
+.paginav .prev .nav-content {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.paginav .next .nav-content {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.paginav .prev .nav-label,
+.paginav .prev .nav-name {
+    text-align: left;
+}
+
+.paginav .next .nav-label,
+.paginav .next .nav-name {
+    text-align: right;
+}
+
+/* .paginav .prev {
+    justify-content: flex-start !important;
+    padding-left: 0.3rem !important;
+}
+
+.paginav .next {
+    justify-content: flex-end !important;
+    padding-right: 0.3rem !important;
+} */
 .custom-title {
     border-left: none !important;
     padding-left: 0 !important;
@@ -595,7 +612,7 @@ details[open] .collapse-content {
     border: none !important;
     border-radius: 0 !important;
     padding: 0 !important;
-    margin: 2.5rem 0 !important;
+    margin: 0.75rem 0 !important;
 }
 
 .paginav a,
@@ -614,19 +631,21 @@ details[open] .collapse-content {
 .paginav-dead {
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
-    padding: 0.6rem 1rem !important;
-    border-radius: 12px !important;
+    gap: 6px !important;
+    padding: 0.35rem 1rem !important;
+    border-radius: 10px !important;
     width: 50% !important;
+    overflow: hidden !important;
     transition: background 0.2s ease !important;
 }
 
-.paginav .next,
+
+/* .paginav .next,
 .paginav-dead.next {
     justify-content: flex-end !important;
 }
 
-.paginav .next .nav-content { align-items: flex-end; }
+.paginav .next .nav-content { align-items: flex-end; } */
 
 .paginav-dead {
     opacity: 0.45 !important;
@@ -634,20 +653,25 @@ details[open] .collapse-content {
     cursor: not-allowed !important;
 }
 
-/* light theme (default) */
+/* Light theme (default) */
 .paginav a,
 .paginav-dead {
     background: transparent !important;
     border: 1px solid rgba(0, 0, 0, 0.12) !important;
 }
+
 .paginav a:hover,
 .paginav a:focus,
-.paginav a:active { background: rgba(0, 0, 0, 0.05) !important; border: 1px solid rgba(0, 0, 0, 0.12) !important; }
+.paginav a:active {
+    background: rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
 .nav-label { color: rgba(0, 0, 0, 0.4); }
 .nav-name  { color: rgba(0, 0, 0, 0.85); }
 .nav-arrow { color: rgba(0, 0, 0, 0.5); }
 
-/* dark theme */
+/* Dark theme */
 html.dark .paginav a, html[data-theme="dark"] .paginav a,
 body.dark .paginav a, .dark .paginav a,
 html.dark .paginav-dead, html[data-theme="dark"] .paginav-dead,
@@ -655,15 +679,17 @@ body.dark .paginav-dead, .dark .paginav-dead {
     background: transparent !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
+
 html.dark .paginav a:hover, html[data-theme="dark"] .paginav a:hover,
 body.dark .paginav a:hover, .dark .paginav a:hover {
     background: rgba(255, 255, 255, 0.07) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
+
 html.dark .nav-label, html[data-theme="dark"] .nav-label,
 body.dark .nav-label, .dark .nav-label { color: rgba(255, 255, 255, 0.4); }
-html.dark .nav-name, html[data-theme="dark"] .nav-name,
-body.dark .nav-name, .dark .nav-name   { color: rgba(255, 255, 255, 0.85); }
+html.dark .nav-name,  html[data-theme="dark"] .nav-name,
+body.dark .nav-name,  .dark .nav-name  { color: rgba(255, 255, 255, 0.85); }
 html.dark .nav-arrow, html[data-theme="dark"] .nav-arrow,
 body.dark .nav-arrow, .dark .nav-arrow { color: rgba(255, 255, 255, 0.6); }
 
@@ -679,17 +705,17 @@ body.dark .nav-arrow, .dark .nav-arrow { color: rgba(255, 255, 255, 0.6); }
 .nav-content {
     display: flex;
     flex-direction: column;
-    gap: 0px;        /* was 1px */
+    gap: 0px;
     overflow: hidden;
 }
 
 .nav-label {
-    font-size: 12px;  /* was 11px */
+    font-size: 12px;
     font-weight: 400;
 }
 
 .nav-name {
-    font-size: 15px;  /* was 13px */
+    font-size: 15px;
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
@@ -697,53 +723,287 @@ body.dark .nav-arrow, .dark .nav-arrow { color: rgba(255, 255, 255, 0.6); }
 }
 
 
-/* 10. Fade in on page load */
+/* 10. FADE IN ON PAGE LOAD
+   ========================================================== */
+
 body {
-  animation: fadeIn 0.6s ease-out;
+    animation: fadeIn 0.6s ease-out;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0.9; }
-  to   { opacity: 1; }
+    from { opacity: 0.9; }
+    to   { opacity: 1; }
 }
 
-/*
-11. BreadCrumbs
-*/
+
+/* 11. BREADCRUMBS
+   ========================================================== */
+
 .breadcrumbs {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  padding: 8px 0;
-  color: var(--secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    padding: 8px 0;
+    color: var(--secondary);
 }
 
 .breadcrumbs a {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--secondary);
-  text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--secondary);
+    text-decoration: none;
 }
 
 .breadcrumbs a:hover {
-  color: var(--primary);
+    color: var(--primary);
 }
 
 .breadcrumb-sep {
-  color: var(--secondary);
-  opacity: 0.5;
+    color: var(--secondary);
+    opacity: 0.5;
 }
 
 .breadcrumb-current {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--primary);
-  font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--primary);
+    font-weight: 500;
 }
 
 .breadcrumbs svg {
-  flex-shrink: 0;
+    flex-shrink: 0;
+}
+
+
+/* 12. TOC SIDEBAR LAYOUT
+   ========================================================== */
+
+.post-with-toc {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) min(760px, 100%) minmax(0, 1fr);
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+.toc-sidebar {
+    grid-column: 1;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 2rem;
+}
+
+.toc-sticky {
+    position: sticky;
+    top: 90px;
+    width: 180px;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    align-self: flex-start;
+}
+
+.toc-sticky::-webkit-scrollbar { display: none; }
+
+.toc-sticky h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.6rem;
+    color: var(--primary);
+    text-transform: none;
+    letter-spacing: 0;
+    opacity: 1;
+}
+
+.toc-sticky #TableOfContents > ul > li > a {
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: var(--secondary);
+    opacity: 0.9;
+}
+
+.toc-sticky #TableOfContents a {
+    display: block;
+    color: var(--secondary);
+    text-decoration: none;
+    padding: 2px 0;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    transition: color 0.2s ease;
+    opacity: 0.9;
+}
+
+.toc-sticky #TableOfContents a:hover {
+    color: var(--primary);
+    opacity: 1;
+}
+/* 
+.toc-sticky #TableOfContents a:hover {
+    color: var(--primary);
+} */
+
+.toc-sticky #TableOfContents ul {
+    list-style: none;
+    padding-left: 0.75rem;
+    margin: 0;
+}
+
+.toc-sticky #TableOfContents li { margin: 3px 0; }
+
+.post-body {
+    grid-column: 2;
+    min-width: 0;
+}
+
+@media (max-width: 1100px) {
+    .toc-sidebar { display: none; }
+    .post-with-toc {
+        width: 100%;
+        left: 0;
+        transform: none;
+        display: block;
+    }
+}
+
+
+/* 13. POST HEADER — CENTERED LAYOUT
+   ========================================================== */
+
+.post-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Flex order: breadcrumbs → title → reading time */
+.breadcrumbs        { order: 1; align-self: flex-start; }
+.custom-title       { order: 2; }
+.custom-meta-top    { order: 3; }
+.custom-meta-bottom { order: 4; }
+.paginav-header     { order: 5; }
+
+.custom-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 1rem 0 0.3rem;
+    text-align: center;
+}
+
+.custom-meta-top {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0.2rem 0 0.5rem;
+    color: var(--secondary);
+    font-size: 0.78rem;
+}
+
+.custom-meta-bottom {
+    justify-content: center;
+    margin: 0.5rem 0 0.4rem;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.post-header::after,
+.post-header hr {
+    display: none;
+}
+
+.post-single > .post-header {
+    border-bottom: none !important;
+    padding-bottom: 0;
+}
+
+.paginav-header {
+    border: none;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.paginav-header .prev,
+.paginav-header .next,
+.paginav-header .paginav-dead {
+    border: none;
+    background: transparent;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    padding: 0.75rem 0;
+    transition: opacity 0.2s ease;
+}
+
+.paginav-header .prev:hover,
+.paginav-header .next:hover {
+    background: transparent;
+    opacity: 0.7;
+}
+
+.post-header .post-meta + * {
+    border-top: 1px solid var(--border);
+}
+
+
+/* 14. TEXT COLOR CONTRAST
+   ========================================================== */
+
+/* Light mode — darker body text */
+body {
+    color: #1a1a1a;
+}
+
+.post-content,
+.post-content p,
+.post-content li,
+.post-content blockquote {
+    color: #1a1a1a;
+}
+
+/* Dark mode — whiter body text */
+html.dark body,
+html[data-theme="dark"] body,
+.dark body {
+    color: #e8e8e8;
+}
+
+html.dark .post-content,
+html.dark .post-content p,
+html.dark .post-content li,
+html.dark .post-content blockquote,
+html[data-theme="dark"] .post-content,
+html[data-theme="dark"] .post-content p,
+html[data-theme="dark"] .post-content li {
+    color: #e8e8e8;
+}
+
+/* Secondary text (dates, labels, etc.) */
+html.dark .nav-label,
+html[data-theme="dark"] .nav-label {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+html.dark .nav-name,
+html[data-theme="dark"] .nav-name {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+/* Post list entry titles */
+html.dark .entry-header h2,
+html[data-theme="dark"] .entry-header h2 {
+    color: #f0f0f0;
+}
+
+.entry-header h2 {
+    color: #111111;
+}
+
+.post-footer .post-tags,
+.post-tags {
+    display: none !important;
 }

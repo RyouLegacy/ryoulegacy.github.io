@@ -1,5 +1,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // ── Theme palette ──
     const paletteBtn = document.getElementById('palette-toggle');
     const gadget = document.getElementById('theme-gadget');
     const slider = document.getElementById('tg-slider');
@@ -7,46 +8,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetButton = document.getElementById('tg-reset');
     const root = document.documentElement;
 
-    // Toggle dropdown open/close
-    paletteBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); 
-        gadget.classList.toggle('show');
-    });
+    if (paletteBtn && gadget) {
+        paletteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            gadget.classList.toggle('show');
+        });
+        document.addEventListener('click', (e) => {
+            if (!gadget.contains(e.target)) gadget.classList.remove('show');
+        });
+    }
 
-    // Close dropdown when clicking anywhere else
-    document.addEventListener('click', (e) => {
-        if (!gadget.contains(e.target)) {
-            gadget.classList.remove('show');
-        }
-    });
-
-    // Function to apply the color
     const updateTheme = (hue) => {
-        const newColor = `hsl(${hue}, 80%, 65%)`; 
-        root.style.setProperty('--primary', newColor);
-        valueDisplay.textContent = hue;
+        root.style.setProperty('--primary', `hsl(${hue}, 80%, 65%)`);
+        if (valueDisplay) valueDisplay.textContent = hue;
         localStorage.setItem('custom-theme-hue', hue);
     };
 
-    // Check saved color on load
     const savedHue = localStorage.getItem('custom-theme-hue');
-    if (savedHue !== null) {
+    if (savedHue !== null && slider) {
         slider.value = savedHue;
         updateTheme(savedHue);
     }
 
-    // Live update on slider drag
-    slider.addEventListener('input', (e) => {
-        updateTheme(e.target.value);
-    });
+    if (slider) slider.addEventListener('input', (e) => updateTheme(e.target.value));
 
-    // Reset button
-    resetButton.addEventListener('click', (e) => {
-        e.stopPropagation(); 
-        root.style.removeProperty('--primary');
-        localStorage.removeItem('custom-theme-hue');
-        slider.value = 0;
-        valueDisplay.textContent = '0';
-    });
+    if (resetButton) {
+        resetButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            root.style.removeProperty('--primary');
+            localStorage.removeItem('custom-theme-hue');
+            if (slider) slider.value = 0;
+            if (valueDisplay) valueDisplay.textContent = '0';
+        });
+    }
 });
 </script>
