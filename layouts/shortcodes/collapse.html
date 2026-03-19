@@ -1,0 +1,17 @@
+{{ $summary := .Get "summary" | default "Details" }}
+{{ $lang := .Get "lang" | default "" }}
+<details class="collapse-block">
+  <summary class="collapse-summary">
+    <span class="collapse-icon"></span>
+    {{ $summary }}
+  </summary>
+  <div class="collapse-content">
+    <div>
+      {{ if $lang }}
+        {{ highlight (.Inner | strings.TrimSpace) $lang "" }}
+      {{ else }}
+        {{ .Inner | strings.TrimSpace | markdownify }}
+      {{ end }}
+    </div>
+  </div>
+</details>

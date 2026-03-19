@@ -484,3 +484,266 @@ iframe {
 .entry-cover img {
     border: 1px solid var(--border);
 }
+
+
+/*
+6. COLLASPE 
+*/
+/* ── Collapse Block ───────────────────────────────────────── */
+.collapse-block {
+  margin: 1.5rem 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--entry);   /* ← add this */
+}
+
+/* ── Summary row ──────────────────────────────────────────── */
+.collapse-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  list-style: none;
+  user-select: none;
+}
+
+.collapse-summary::-webkit-details-marker { display: none; }
+
+/* ── Divider when open ────────────────────────────────────── */
+details[open] .collapse-summary {
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Chevron ──────────────────────────────────────────────── */
+.collapse-icon {
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid var(--primary);
+  border-bottom: 2px solid var(--primary);
+  transform: rotate(-45deg);
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+details[open] .collapse-icon {
+  transform: rotate(45deg);
+}
+
+/* ── Smooth open/close ────────────────────────────────────── */
+.collapse-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+details[open] .collapse-content {
+  grid-template-rows: 1fr;
+}
+
+.collapse-content > div {
+  overflow: hidden;
+}
+
+/* ── Remove inner highlight margin so it sits flush ──────── */
+.collapse-block .highlight {
+  margin: 0;
+}
+
+/* ── Smooth open/close ────────────────────────────────────── */
+.collapse-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.7s cubic-bezier(0.4, 0, 0.2, 1);  /* 0.35s → 0.7s */
+}
+
+details[open] .collapse-content {
+  grid-template-rows: 1fr;
+}
+
+.collapse-content > div {
+  overflow: hidden;
+  min-height: 0;   /* ← this is the missing piece */
+}
+
+/*
+7. NAVIGATION FOOTER
+*/
+
+.paginav-header {
+    margin: 1.5rem 0 0 !important;
+}
+
+/* remove the left border accent on the title when centered */
+.custom-title {
+    border-left: none !important;
+    padding-left: 0 !important;
+}
+
+.paginav {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 12px !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 2.5rem 0 !important;
+}
+
+.paginav a,
+.paginav a:hover,
+.paginav a:focus,
+.paginav a:visited,
+.paginav a:active,
+.paginav a * {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.paginav a,
+.paginav-dead {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 0.6rem 1rem !important;
+    border-radius: 12px !important;
+    width: 50% !important;
+    transition: background 0.2s ease !important;
+}
+
+.paginav .next,
+.paginav-dead.next {
+    justify-content: flex-end !important;
+}
+
+.paginav .next .nav-content { align-items: flex-end; }
+
+.paginav-dead {
+    opacity: 0.45 !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+}
+
+/* light theme (default) */
+.paginav a,
+.paginav-dead {
+    background: transparent !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+.paginav a:hover,
+.paginav a:focus,
+.paginav a:active { background: rgba(0, 0, 0, 0.05) !important; border: 1px solid rgba(0, 0, 0, 0.12) !important; }
+.nav-label { color: rgba(0, 0, 0, 0.4); }
+.nav-name  { color: rgba(0, 0, 0, 0.85); }
+.nav-arrow { color: rgba(0, 0, 0, 0.5); }
+
+/* dark theme */
+html.dark .paginav a, html[data-theme="dark"] .paginav a,
+body.dark .paginav a, .dark .paginav a,
+html.dark .paginav-dead, html[data-theme="dark"] .paginav-dead,
+body.dark .paginav-dead, .dark .paginav-dead {
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+html.dark .paginav a:hover, html[data-theme="dark"] .paginav a:hover,
+body.dark .paginav a:hover, .dark .paginav a:hover {
+    background: rgba(255, 255, 255, 0.07) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+html.dark .nav-label, html[data-theme="dark"] .nav-label,
+body.dark .nav-label, .dark .nav-label { color: rgba(255, 255, 255, 0.4); }
+html.dark .nav-name, html[data-theme="dark"] .nav-name,
+body.dark .nav-name, .dark .nav-name   { color: rgba(255, 255, 255, 0.85); }
+html.dark .nav-arrow, html[data-theme="dark"] .nav-arrow,
+body.dark .nav-arrow, .dark .nav-arrow { color: rgba(255, 255, 255, 0.6); }
+
+.nav-arrow {
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.paginav a:hover .arrow-left  { transform: translateX(-3px); }
+.paginav a:hover .arrow-right { transform: translateX(3px); }
+
+.nav-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;        /* was 1px */
+    overflow: hidden;
+}
+
+.nav-label {
+    font-size: 12px;  /* was 11px */
+    font-weight: 400;
+}
+
+.nav-name {
+    font-size: 15px;  /* was 13px */
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* 10. Fade in on page load */
+body {
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0.9; }
+  to   { opacity: 1; }
+}
+
+/*
+11. BreadCrumbs
+*/
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  padding: 8px 0;
+  color: var(--secondary);
+}
+
+.breadcrumbs a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--secondary);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  color: var(--primary);
+}
+
+.breadcrumb-sep {
+  color: var(--secondary);
+  opacity: 0.5;
+}
+
+.breadcrumb-current {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.breadcrumbs svg {
+  flex-shrink: 0;
+}

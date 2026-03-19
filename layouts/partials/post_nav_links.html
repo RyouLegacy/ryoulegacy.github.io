@@ -1,0 +1,40 @@
+{{- $pages := where site.RegularPages "Type" "in" site.Params.mainSections }}
+{{- if and (gt (len $pages) 1) (in $pages . ) }}
+<nav class="paginav">
+  {{- with $pages.Next . }}
+  <a class="prev" href="{{ .Permalink }}">
+    <span class="nav-arrow arrow-left">←</span>
+    <div class="nav-content">
+      <span class="nav-label">Next Post</span>
+      <span class="nav-name">{{- .Name -}}</span>
+    </div>
+  </a>
+  {{- else }}
+  <div class="paginav-dead">
+    <span class="nav-arrow">←</span>
+    <div class="nav-content">
+      <span class="nav-label">Next Post</span>
+      <span class="nav-name">No more posts</span>
+    </div>
+  </div>
+  {{- end }}
+
+  {{- with $pages.Prev . }}
+  <a class="next" href="{{ .Permalink }}">
+    <div class="nav-content">
+      <span class="nav-label">Previous Post</span>
+      <span class="nav-name">{{- .Name -}}</span>
+    </div>
+    <span class="nav-arrow arrow-right">→</span>
+  </a>
+  {{- else }}
+  <div class="paginav-dead next">
+    <div class="nav-content">
+      <span class="nav-label">Previous Post</span>
+      <span class="nav-name">No more posts</span>
+    </div>
+    <span class="nav-arrow">→</span>
+  </div>
+  {{- end }}
+</nav>
+{{- end }}

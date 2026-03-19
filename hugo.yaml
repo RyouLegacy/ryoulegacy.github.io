@@ -95,7 +95,7 @@ params:
 markup:
   highlight:
     noClasses: false
-    style: monokai
+    style: github
     lineNos: true
   tableOfContents:
     startLevel: 2
