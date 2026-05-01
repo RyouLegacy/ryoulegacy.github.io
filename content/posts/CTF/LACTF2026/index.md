@@ -2,6 +2,7 @@
 title: "LACTF"
 date: 2026-02-14
 draft: false
+description: Interesting DOS challenge in LACTF
 tags: ["Reverse Engineering", "Cryptography"]
 ---
 

@@ -2,6 +2,7 @@
 title: "Crackmes.one RE CTF 2026"
 date: 2026-03-17
 draft: false
+description: Discussion about Crackmes.one RE challenge
 tags: ["Obfuscated", "Reverse Engineering"]
 ---
 
@@ -25,7 +26,7 @@ However, this program implemented a minimalist GUI with the `OK` confirm button.
 
 We can find the validation function which is at `405399h`
 
-{{< collapse summary="Detail" lang="c" >}}
+```c
 int __thiscall sub_405399(int this)
 {
   // truncated
@@ -54,12 +55,12 @@ int __thiscall sub_405399(int this)
     return sub_4057DA(dwInitParam);
   }
 }
-{{< /collapse >}}
+```
 
 `sub_4030A5` is used to authenticate the serial. It calls the some init function and check the serial in the `.pc` section at `loc_40A000` and `sub_40A025` respectively
 
 The function at 40112Ch is one of the Dynamic API Resolution/Hashing
-{{< collapse summary="Detail" lang="c" >}}
+```c
 int __thiscall sub_40112C(void *this, int a2, int a3, int n64, int a5)
 {
   int v5; // eax
@@ -69,9 +70,9 @@ int __thiscall sub_40112C(void *this, int a2, int a3, int n64, int a5)
   v6 = (int (__stdcall *)(int, int, int, int))sub_401AD3(v5);
   return v6(a2, a3, n64, a5);
 }
-{{< /collapse >}}
+```
 
-{{< collapse summary="Detail" lang="c" >}}
+```c
 int __thiscall sub_401AD3(int *this)
 {
   int v2; // eax
@@ -92,7 +93,7 @@ int __thiscall sub_401AD3(int *this)
   }
   return this_1[5];
 }
-{{< /collapse >}}
+```
 By using Hashdb with unmodified CRC32 algorithm we can find this stands for VirtualProtect
 So the function at `04046C8h` is changing the memory of the PC segment to `PAGE_EXECUTE_READWRITE`
 
@@ -101,13 +102,13 @@ All of important API are dynamically resolved but luckily the list is pretty sho
 There is a struct object that is used during the whole program which is initialized at `403DD2h`
 
 Alright come back to the `4046C8h` function there is a small stub thats cause a breakpoint interruption
-{{< collapse summary="Detail" lang="c" >}}
+```c
 void __thiscall mw_do_breakpoint(_BYTE *this)
 {
   *(this + 1) = 1;
   __debugbreak();
 }
-{{< /collapse >}}
+```
 
 Alright all is what we get while trying to travel follow the program flow, nothing special to inspect anymore. 
 
@@ -117,7 +118,7 @@ Talk more about this a little bit. What I have known so far is this function wil
 
 So back to the binary. The KiUserExceptionDispatcher will lie in `040187A`, by examining all its cross reference function you could find this interesting function
 
-{{< collapse summary="Detail" lang="c" >}}
+```c
 int __stdcall sub_402E5A(int a1, int a2, int a3, int a4, int a5)
 {
   int *v5; // eax
@@ -142,14 +143,14 @@ int __stdcall sub_402E5A(int a1, int a2, int a3, int a4, int a5)
   v9 = (int (__stdcall *)(int, int, int, int, int))mw_api_CallWindowProcA(kernel_imgbase);
   return v9(a1, a2, a3, a4, a5);
 }
-{{< /collapse >}}
+```
 
 There is an Anti-debugging technique in the `overwrite_NtQueryInformationProcess` function, by checking the ProcessDebugPort we can just manually patch this to bypass this simple hindering stuff.
 
 
 So if no debugger is debugging the program it will trigger the `overwrite_the_API` which is a really interesting function.
 
-{{< collapse summary="Detail" lang="c" >}}
+```c
 void __thiscall overwrite_the_API(_BYTE *this, int custom_seh_handler, int a3)
 {
   int *kernel_imgbase; // eax
@@ -181,7 +182,7 @@ void __thiscall overwrite_the_API(_BYTE *this, int custom_seh_handler, int a3)
     *this = 1;
   }
 }
-{{< /collapse >}}
+```
 First of all this function used VirtualProtect to change the memory protection of ntdll's text section to PAGE_EXECUTE_READWRITE which is often only READ and WRITE are allowed. After that it used a technique call inline hooking, create a indirect trampoline lead to the custom structured exception handler. 
 It used an assembly PUSH-RET trick to craft the trampoline. The byte 0x68 and 0x3C is translated to PUSH and RET respectively so the very first 6 bytes of this looks like
 ```asm
@@ -190,7 +191,7 @@ RET
 ```
 
 This is challenge's custom exception handler
-{{< collapse summary="Detail" lang="c" >}}
+```c
 void __thiscall mw_exception_handler(obj *this, _EXCEPTION_RECORD *record, _CONTEXT *context)
 {
   if ( !this->two )
@@ -209,12 +210,12 @@ void __thiscall mw_exception_handler(obj *this, _EXCEPTION_RECORD *record, _CONT
     }
   }
 }
-{{< /collapse >}}
+```
 
 Sorry for the inconvenience but I would not dive deep into how am I able to reverse this binary but in general, I was using x32dbg to debug, watching memmory at runtime and guessing the variable function properties and rename it. However there is still some part that I don't understand but the challenge is totally solvable without the comprehensive understanding about the binary
 
 I would anlyze this first, those other exception handler is not much different
-{{< collapse summary="Detail" lang="c" >}}
+```c
 int __thiscall exception_breakpoint_handler(obj *this, _CONTEXT *context)
 {
   _CONTEXT *context_1; // edi
@@ -240,7 +241,7 @@ int __thiscall exception_breakpoint_handler(obj *this, _CONTEXT *context)
   }
   return -1;
 }
-{{< /collapse >}}
+```
 
 So in the `set_ctxflag` it resets some register variable and activate the Trap Flag for the single step exception handler. 
 
@@ -258,7 +259,7 @@ Alright then just manually patch all the pc section by the decrypted value.
 
 Now back to the branch dispatcher function at `404166h`
 
-{{< collapse summary="Detail" lang="c" >}}
+```c
 bool __stdcall check(int a1, _CONTEXT *context)
 {
   DWORD EFlags; // ecx
@@ -337,7 +338,7 @@ LABEL_3:
   }
   return result;
 }
-{{< /collapse >}}
+```
 The logic is not that hard, it is a little bit lengthy. For example the first one is simulate the `JNE/JNZ` instruction
 You would not have to remember these signature, just googling them
 This is what you get after reversing the function given in the format `(name, short jump, near jump)`
@@ -367,7 +368,7 @@ jcc = {
 So the breakpoint interruption will be replaced by one of these jcc instruction. So how does it change? Well remember the 
 hardcoded map table I said above? You can dump this value by looking at the map table initialization at the function lies in `4045A7h`. 
 
-{{< collapse summary="Detail" lang="c" >}}
+```c
 void __thiscall sub_4045A7(char *this, unsigned int *a2)
 {
   unsigned int v2; // ebx
@@ -390,7 +391,7 @@ void __thiscall sub_4045A7(char *this, unsigned int *a2)
     while ( v2 < *a2 );
   }
 }
-{{< /collapse >}}
+```
 
 The call instruction at `4045DAh` is stl map insert function, 16 bytes from the second argument of the `4045A7h` stub. So the solution was first place a breakpoint at `4045DAh` and follow in dump the value stored in `EDI`
 
@@ -424,7 +425,7 @@ By chaining all the aforementioned pieces, you can deobfuscate this amazing chal
 
 This is where the 5 different chunk's result hash value be initialized
 
-{{< collapse summary="Detail" lang="c" >}}
+```c
 serial_obj14 *__thiscall encrypted_stuff(serial_obj14 *this)
 {
   this->first = 0x865DBB47;
@@ -434,10 +435,10 @@ serial_obj14 *__thiscall encrypted_stuff(serial_obj14 *this)
   this->five = 0x59FEBDFB;
   return this;
 }
-{{< /collapse >}}
+```
 
 And the authentication algorithm is 
-{{< collapse summary="Detail" lang="c" >}}
+```c
 bool __thiscall validate_hash_value(serial_obj14 *obj, char *serial)
 {
   HCRYPTPROV *inited; // eax
@@ -497,12 +498,12 @@ bool __thiscall validate_hash_value(serial_obj14 *obj, char *serial)
   }
   return program_flag == 4;
 }
-{{< /collapse >}}
+```
 
 This is basically divide the 19 bytes of the serial into 5 different chunks, each chunk is 4-bytes length then calculate hash of each character consecutively base on the `calc_next_hash` function. Then if all is matched, the serial checker is valid, our flag will appear
 We don't have to understand what the `calc_next_hash` does, we can just manually simulate it in the script by looking really quick through the pseudocode. Then start cracking the hash, this is my solve script
 
-{{< collapse summary="hash_crack.py" lang="python" >}}
+```python
 
 #!/home/ryou/.venvs/rev/bin/python
 
@@ -601,10 +602,10 @@ for chunk in range(5):
     hash = (0x112233 * (chunk + 1) * 4 - 0x35014542) & 0xFFFFFFFF
 print(final_serial)
 
-{{< /collapse >}}
+```
 
 
-{{< collapse summary="nanomites_decrypt.py" lang="python" >}}
+```python
 #!/home/ryou/.venvs/rev/bin/python
 
 # key = bytearray(open("keydump.bin", "rb").read())
@@ -663,7 +664,7 @@ for i, opcode in enumerate(decrypted_pc):
     
     patched_byte += list(insn)
     eip = i + sz
-{{< /collapse >}}
+```
 There is a problem in this nanomites deobfuscator. There is an special case that cause incorrect translation, for example
 ```asm
 0000 .byte 0xCC

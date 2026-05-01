@@ -35,11 +35,7 @@ header.header::after {
     transform: translateX(-50%);
     width: 100vw;
     height: 1px;
-    background: linear-gradient(to right,
-            transparent 0%,
-            var(--border) 15%,
-            var(--border) 85%,
-            transparent 100%);
+    background: var(--border);
     display: block;
     transition: opacity 0.4s ease;
 }
@@ -1236,4 +1232,15 @@ html[data-theme="dark"] .entry-header h2 {
 
 .post-year:first-of-type {
     margin-top: 1.25rem;
+}
+
+
+/* 16. POST LIST — DATE TEXT
+   ========================================================== */
+
+.meta-date-text {
+    display: inline-flex;
+    align-items: center;
+    color: var(--secondary);
+    font-size: 0.8rem;
 }

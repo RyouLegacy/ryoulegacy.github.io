@@ -1,7 +1,8 @@
 ---
 title: "Export Table In PE"
 date: 2025-12-20
-draft: true
+description: Explain about export table in PE file type
+draft: false
 categories: ["Reverse"]
 tags: ["PE"]
 ---

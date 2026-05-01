@@ -1,7 +1,8 @@
 ---
 title: "Relocation Table In PE"
-date: 2026-02-14
-draft: true
+date: 2025-12-28
+draft: false
+description: Explain about relocation table in PE file type
 categories: ["Reverse"]
 tags: ["PE"]
 ---

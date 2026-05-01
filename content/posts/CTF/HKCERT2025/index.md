@@ -1,20 +1,19 @@
 ---
 title: "HKCERT"
 date: 2026-02-14
-draft: true
+draft: false
+description: Solution for Reverse Engineering's HKCERT challenge
 tags: ["Reverse Engineering", "Cryptography", "Obfuscated"]
 ---
 
 # Findkey
 
 ## Analyze
-Ở đoạn mã assembly của bài này nó đã bị làm rối, sử dụng nhiều junk codes cũng như switch case, tuy nhiên ở pseudocode IDA đã làm khá tốt khi đã làm phẳng code flow
-
-Bài này còn bị làm rối bằng toán như
+Bài này đã bị Obfuscate CFF + biểu thức toán vô nghĩa
 ![image](first.png)
 
 
-Tuy nhiên mình nhận ra là những con số này chắc chắn là hằng số vì vậy mình có thể đặt breakpoint ngay tại những ví trí quan trọng như index của mảng. Khi đọc mã assembly thì đoạn công thức toán rối đó sẽ được lưu vào thanh ghi nào đó sau đó sẽ được sử dụng dưới mục đích index của mảng hay của vòng lập. Vì vậy mình có thể tìm ra xu hướng thay đổi của nó
+Vì những phép toán này chắc là hằng số nên chỉ cần viết script gdb để trace ra số mà thôi. Khi đọc thì đoạn công thức toán rối đó sẽ được lưu vào thanh ghi nào đó. Vì vậy mình có thể tìm ra xu hướng thay đổi của nó
 
 Script
 ```python 
@@ -71,8 +70,6 @@ Khi mình muốn xem giá trị của 1 cái gì đấy thì chỉ cần chỉnh
 // The function seems has been flattened
 int __fastcall main(int argc, const char **argv, const char **envp)
 {
-..............
-
   n1809819584 = 1809819584;
   noise = 192906851;
   v18 = (int *)(&v6 - 2);
@@ -186,64 +183,6 @@ int __fastcall main(int argc, const char **argv, const char **envp)
 // The function seems has been flattened
 _QWORD *__fastcall is_this_enc(_QWORD *p_plaintext, _QWORD *p_arg_dest, __int64 program_inp)
 {
-  __int64 *dest_10; // rax
-  _QWORD *dest_3; // rax
-  __int64 v5; // [rsp+0h] [rbp-2E0h] BYREF
-  unsigned int v6; // [rsp+8h] [rbp-2D8h]
-  int v7; // [rsp+Ch] [rbp-2D4h]
-  int v8; // [rsp+10h] [rbp-2D0h]
-  _QWORD *plaintext_1; // [rsp+18h] [rbp-2C8h]
-  _QWORD *dest_1; // [rsp+20h] [rbp-2C0h]
-  __int64 s_1; // [rsp+28h] [rbp-2B8h]
-  int _; // [rsp+30h] [rbp-2B0h]
-  int n115814123; // [rsp+34h] [rbp-2ACh]
-  int n16; // [rsp+3Ch] [rbp-2A4h]
-  __m128i desta[16]; // [rsp+40h] [rbp-2A0h] BYREF
-  int n9_3; // [rsp+148h] [rbp-198h]
-  int counter; // [rsp+14Ch] [rbp-194h]
-  _BYTE destination[160]; // [rsp+150h] [rbp-190h] BYREF
-  _BYTE source[16]; // [rsp+1F0h] [rbp-F0h] BYREF
-  __int64 dest; // [rsp+200h] [rbp-E0h] BYREF
-  __int64 v21; // [rsp+208h] [rbp-D8h]
-  __int64 s_2; // [rsp+210h] [rbp-D0h]
-  _QWORD *dest_2; // [rsp+218h] [rbp-C8h]
-  __int64 *p_plaintext2; // [rsp+220h] [rbp-C0h]
-  __int64 *dest_6; // [rsp+228h] [rbp-B8h]
-  int n9_6; // [rsp+234h] [rbp-ACh]
-  __int64 *p_dest; // [rsp+238h] [rbp-A8h]
-  _BYTE *dest_5; // [rsp+240h] [rbp-A0h]
-  int n9_1; // [rsp+248h] [rbp-98h]
-  unsigned int v30; // [rsp+24Ch] [rbp-94h]
-  int v31; // [rsp+250h] [rbp-90h]
-  int v32; // [rsp+254h] [rbp-8Ch]
-  int v33; // [rsp+258h] [rbp-88h]
-  int v34; // [rsp+25Ch] [rbp-84h]
-  int n9_2; // [rsp+260h] [rbp-80h]
-  int v36; // [rsp+264h] [rbp-7Ch]
-  unsigned int v37; // [rsp+268h] [rbp-78h]
-  int n16_2; // [rsp+26Ch] [rbp-74h]
-  __int64 *dest_7; // [rsp+270h] [rbp-70h]
-  _BYTE *dest_8; // [rsp+278h] [rbp-68h]
-  int n9_4; // [rsp+284h] [rbp-5Ch]
-  int v42; // [rsp+288h] [rbp-58h]
-  int v43; // [rsp+28Ch] [rbp-54h]
-  int v44; // [rsp+290h] [rbp-50h]
-  int v45; // [rsp+294h] [rbp-4Ch]
-  int v46; // [rsp+298h] [rbp-48h]
-  int v47; // [rsp+29Ch] [rbp-44h]
-  int v48; // [rsp+2A0h] [rbp-40h]
-  int n16_1; // [rsp+2A4h] [rbp-3Ch]
-  int v50; // [rsp+2A8h] [rbp-38h]
-  int v51; // [rsp+2ACh] [rbp-34h]
-  unsigned int v52; // [rsp+2B0h] [rbp-30h]
-  int v53; // [rsp+2B4h] [rbp-2Ch]
-  __int64 *v54; // [rsp+2B8h] [rbp-28h]
-  _BYTE *dest_9; // [rsp+2C0h] [rbp-20h]
-  int n9_5; // [rsp+2CCh] [rbp-14h]
-  int v57; // [rsp+2D0h] [rbp-10h]
-  int v58; // [rsp+2D4h] [rbp-Ch]
-  int v59; // [rsp+2D8h] [rbp-8h]
-  int v60; // [rsp+2DCh] [rbp-4h]
 
   plaintext_1 = p_plaintext;
   dest_1 = p_arg_dest;
