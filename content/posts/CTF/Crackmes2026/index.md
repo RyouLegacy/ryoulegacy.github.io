@@ -2,8 +2,7 @@
 title: "Crackmes.one RE CTF 2026"
 date: 2026-03-17
 draft: false
-categories: ["Reverse"]
-tags: ["Obfuscated"]
+tags: ["Obfuscated", "Reverse Engineering"]
 ---
 
 ## Discussion Crackme9

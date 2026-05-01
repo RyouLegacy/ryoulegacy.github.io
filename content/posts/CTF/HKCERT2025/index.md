@@ -2,8 +2,7 @@
 title: "HKCERT"
 date: 2026-02-14
 draft: true
-categories: ["Reverse", "Crypto"]
-tags: ["Obfuscated"]
+tags: ["Reverse Engineering", "Cryptography", "Obfuscated"]
 ---
 
 # Findkey

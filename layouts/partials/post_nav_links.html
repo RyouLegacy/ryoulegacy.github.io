@@ -5,7 +5,7 @@
   <a class="prev" href="{{ .Permalink }}">
     <span class="nav-arrow arrow-left">←</span>
     <div class="nav-content">
-      <span class="nav-label">Next Post</span>
+      <span class="nav-label">Older</span>
       <span class="nav-name">{{- .Name -}}</span>
     </div>
   </a>
@@ -13,7 +13,7 @@
   <div class="paginav-dead">
     <span class="nav-arrow">←</span>
     <div class="nav-content">
-      <span class="nav-label">Next Post</span>
+      <span class="nav-label">Older</span>
       <span class="nav-name">No more posts</span>
     </div>
   </div>
@@ -22,7 +22,7 @@
   {{- with $pages.Prev . }}
   <a class="next" href="{{ .Permalink }}">
     <div class="nav-content">
-      <span class="nav-label">Previous Post</span>
+      <span class="nav-label">Newer</span>
       <span class="nav-name">{{- .Name -}}</span>
     </div>
     <span class="nav-arrow arrow-right">→</span>
@@ -30,7 +30,7 @@
   {{- else }}
   <div class="paginav-dead next">
     <div class="nav-content">
-      <span class="nav-label">Previous Post</span>
+      <span class="nav-label">Newer</span>
       <span class="nav-name">No more posts</span>
     </div>
     <span class="nav-arrow">→</span>

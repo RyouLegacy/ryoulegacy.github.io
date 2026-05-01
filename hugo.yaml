@@ -19,24 +19,21 @@ outputs:
 
 # 1. ADDED 'tag: tags' HERE
 taxonomies:
-  category: categories
+  # category: categories
   tag: tags
 
 menu:
   main:
-    - name: Posts
+    - name: Post
       url: /posts/
       weight: 1
-    - name: Search
-      url: /search/
+    - name: About
+      url: /about/
       weight: 3
-    - name: Category
-      url: /categories/
-      weight: 4
     # 2. ADDED TAGS MENU ITEM HERE
     - name: Tag
       url: /tags/
-      weight: 5
+      weight: 
 
 params:
   env: production
@@ -77,7 +74,7 @@ params:
   # These are already correctly set!
   ShowTags: true
   ShowPostMeta: true
-  ShowCategories: true
+  ShowCategories: false
 
   profileMode:
     enabled: True
@@ -90,8 +87,8 @@ params:
     buttons:
       # - name: Posts
       #   url: /posts/
-      - name: Archived Posts
-        url: /archives/
+      - name: View All Post
+        url: /posts/
 
   socialIcons:
     - name: github

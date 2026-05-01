@@ -1,8 +1,8 @@
 ---
 title: "LACTF"
 date: 2026-02-14
-draft: true
-categories: ["Reverse", "Crypto"]
+draft: false
+tags: ["Reverse Engineering", "Cryptography"]
 ---
 
 ## lactf-1986
