@@ -1,0 +1,35 @@
+{{- define "main" }}
+{{- $pages := .RegularPagesRecursive.ByDate.Reverse }}
+{{- $paginator := .Paginate $pages }}
+<section class="research-index" aria-labelledby="research-index-title">
+    <header class="research-hero">
+        <div class="endpoint-heading">
+            <h1 id="research-index-title">BLOGS &amp; WRITEUP</h1>
+            <p>Notes from reverse engineering and CTFs.</p>
+        </div>
+    </header>
+    {{- if gt (len $paginator.Pages) 0 }}
+    <div class="research-years">
+        {{- range $group := $paginator.Pages.GroupByDate "2006" }}
+        <section class="research-year-group" aria-labelledby="year-{{ $group.Key }}">
+            <h2 class="research-year" id="year-{{ $group.Key }}"><span>{{ $group.Key }}</span></h2>
+            <div class="research-feed">
+                {{- range $page := $group.Pages }}
+                {{- partial "research_entry.html" $page }}
+                {{- end }}
+            </div>
+        </section>
+        {{- end }}
+    </div>
+    {{- else }}
+    <div class="research-empty" role="status"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6M8 13h8M8 17h5" /></svg><h2>No research notes yet</h2><p>Published articles will appear here when they are ready.</p></div>
+    {{- end }}
+    {{- if gt $paginator.TotalPages 1 }}
+    <nav class="research-pagination" aria-label="Posts pagination">
+        <div>{{- if $paginator.HasPrev }}<a rel="prev" href="{{ $paginator.Prev.URL }}" aria-label="Previous page"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6" /></svg><span>{{ i18n "prev_page" }}</span></a>{{- else }}<span class="pagination-placeholder" aria-hidden="true"></span>{{- end }}</div>
+        <span class="research-page-status">Page {{ $paginator.PageNumber }} <span aria-hidden="true">/</span><span class="sr-only"> of </span> {{ $paginator.TotalPages }}</span>
+        <div>{{- if $paginator.HasNext }}<a rel="next" href="{{ $paginator.Next.URL }}" aria-label="Next page"><span>{{ i18n "next_page" }}</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>{{- else }}<span class="pagination-placeholder" aria-hidden="true"></span>{{- end }}</div>
+    </nav>
+    {{- end }}
+</section>
+{{- end }}

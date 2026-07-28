@@ -1,139 +1,80 @@
 <header class="header">
-    <nav class="nav">
+    <nav class="nav site-nav" aria-label="Primary navigation">
         <div class="logo">
-            {{- $label_text := (site.Params.label.text | default site.Title) }}
+            {{- $labelText := (site.Params.label.text | default site.Title) }}
             {{- if site.Title }}
-            <a href="{{ "" | absLangURL }}" accesskey="h" title="{{ $label_text }} (Alt + H)">
+            <a class="brand-link" href="{{ "" | relLangURL }}" accesskey="h" title="{{ $labelText }} (Alt + H)" aria-label="{{ $labelText }} home">
+                <span class="brand-prompt" aria-hidden="true">./</span>
                 {{- if site.Params.label.icon }}
                 {{- $img := resources.Get site.Params.label.icon }}
                 {{- if $img }}
                     {{- $processableFormats := (slice "jpg" "jpeg" "png" "tif" "bmp" "gif") -}}
-                    {{- if hugo.IsExtended -}}
-                        {{- $processableFormats = $processableFormats | append "webp" -}}
-                    {{- end -}}
+                    {{- if hugo.IsExtended }}{{- $processableFormats = $processableFormats | append "webp" }}{{- end }}
                     {{- $prod := (hugo.IsProduction | or (eq site.Params.env "production")) }}
-                    {{- if and (in $processableFormats $img.MediaType.SubType) (eq $prod true)}}
-                        {{- if site.Params.label.iconHeight }}
-                            {{- $img = $img.Resize (printf "x%d" site.Params.label.iconHeight) }}
-                        {{ else }}
-                            {{- $img = $img.Resize "x30" }}
-                        {{- end }}
+                    {{- if and (in $processableFormats $img.MediaType.SubType) (eq $prod true) }}
+                        {{- if site.Params.label.iconHeight }}{{- $img = $img.Resize (printf "x%d" site.Params.label.iconHeight) }}{{- else }}{{- $img = $img.Resize "x30" }}{{- end }}
                     {{- end }}
-                    <img src="{{ $img.Permalink }}" alt="" aria-label="logo"
-                        height="{{- site.Params.label.iconHeight | default "30" -}}">
+                    <img src="{{ $img.Permalink }}" alt="" height="{{ site.Params.label.iconHeight | default "30" }}">
                 {{- else }}
-                <img src="{{- site.Params.label.icon | absURL -}}" alt="" aria-label="logo"
-                    height="{{- site.Params.label.iconHeight | default "30" -}}">
-                {{- end -}}
-                {{- else if hasPrefix site.Params.label.iconSVG "<svg" }}
-                    {{ site.Params.label.iconSVG | safeHTML }}
-                {{- end -}}
-                {{- $label_text -}}
+                    <img src="{{ site.Params.label.icon | absURL }}" alt="" height="{{ site.Params.label.iconHeight | default "30" }}">
+                {{- end }}
+                {{- else if hasPrefix site.Params.label.iconSVG "<svg" }}{{ site.Params.label.iconSVG | safeHTML }}{{- end }}
+                <span class="brand-name">{{ $labelText }}</span>
             </a>
             {{- end }}
-            <div class="logo-switches">
-                
-                <div class="theme-color-wrapper" style="position: relative; display: flex; align-items: center;">
-                    <button id="palette-toggle" accesskey="p" title="Theme Color Dropdown" style="background: none; border: none; cursor: pointer; color: var(--primary); display: flex; align-items: center; justify-content: center; padding: 0 8px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
-                            <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
-                            <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle>
-                            <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path>
-                        </svg>
-                    </button>
+        </div>
 
-                    <div id="theme-gadget" class="theme-gadget">
-                        <div class="tg-header">
-                        <div class="tg-title">
-                            <span class="tg-line"></span> Theme Color
-                        </div>
-                        
-                        <div class="tg-actions">
-                            <button id="tg-reset" class="tg-reset" title="Reset to Default">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
-                            </button>
-                            <div id="tg-value" class="tg-value">0</div>
-                        </div>
-                        </div>
-                      <input type="range" id="tg-slider" class="tg-slider" min="0" max="360" value="0">
-                    </div>
-                </div>
-
-                {{- if (not site.Params.disableThemeToggle) }}
-                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
-                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                    </svg>
-                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                    </svg>
-                </button>
-                {{- end }}
-                
-                {{- if (not site.Params.disableLangToggle) }}
-                    {{- $lang := .Lang}}
-                    {{- $separator := or $label_text (not site.Params.disableThemeToggle)}}
-                    {{- with site.Home.Translations }}
-                    <ul class="lang-switch">
-                        {{- if $separator }}<li>|</li>{{ end }}
-                        {{- range . -}}
-                        {{- if ne $lang .Lang }}
-                        <li>
-                            <a href="{{- .Permalink -}}" title="{{ .Language.Params.languageAltTitle | default (.Language.LanguageName | emojify) | default (.Lang | title) }}"
-                                aria-label="{{ .Language.LanguageName | default (.Lang | title) }}">
-                                {{- if (and site.Params.displayFullLangName (.Language.LanguageName)) }}
-                                {{- .Language.LanguageName | emojify -}}
-                                {{- else }}
-                                {{- .Lang | title -}}
-                                {{- end -}}
-                            </a>
-                        </li>
-                        {{- end -}}
-                        {{- end}}
-                    </ul>
+        <div class="nav-menu-shell">
+            <button class="nav-menu-toggle" type="button" aria-controls="nav-panel" aria-expanded="false">
+                <span class="nav-menu-label">Menu</span>
+                <svg class="nav-icon nav-icon-open" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+                <svg class="nav-icon nav-icon-close" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18" /></svg>
+            </button>
+            <div class="nav-panel" id="nav-panel">
+                {{- $currentPage := . }}
+                <ul id="menu">
+                    {{- range site.Menus.main }}
+                    {{- $isExternal := gt (len (findRE "://" .URL)) 0 }}
+                    {{- $menuItemURL := .URL }}
+                    {{- if not $isExternal }}{{- $menuItemURL = .URL | relLangURL }}{{- end }}
+                    {{- $pageURL := $currentPage.RelPermalink }}
+                    {{- $isCurrent := eq $menuItemURL $pageURL }}
+                    {{- if and (not $isExternal) (ne $menuItemURL ("" | relLangURL)) (hasPrefix $pageURL $menuItemURL) }}{{- $isCurrent = true }}{{- end }}
+                    {{- $menuPage := site.GetPage .KeyName }}
+                    {{- $isSearch := and $menuPage (eq $menuPage.Layout "search") }}
+                    <li><a href="{{ $menuItemURL }}" title="{{ .Title | default .Name }}{{ cond $isSearch " (Alt + /)" "" }}"{{ if $isSearch }} accesskey="/"{{ end }}{{ if $isCurrent }} aria-current="page"{{ end }}>
+                        <span>{{ .Pre }}{{ .Name }}{{ .Post }}</span>
+                        {{- if $isExternal }}<svg class="external-link-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><path d="M15 3h6v6M10 14 21 3" /></svg><span class="sr-only"> (opens external site)</span>{{- end }}
+                    </a></li>
                     {{- end }}
-                {{- end }}
+                </ul>
+
+                <div class="logo-switches" aria-label="Display settings">
+                    <div class="theme-color-wrapper">
+                        <button id="palette-toggle" type="button" accesskey="p" title="Theme color" aria-label="Choose theme color" aria-controls="theme-gadget" aria-expanded="false">
+                            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor" /><circle cx="17.5" cy="10.5" r=".5" fill="currentColor" /><circle cx="8.5" cy="7.5" r=".5" fill="currentColor" /><circle cx="6.5" cy="12.5" r=".5" fill="currentColor" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.84-.44-1.13-.29-.29-.44-.65-.44-1.12a1.64 1.64 0 0 1 1.67-1.67h2c3.05 0 5.55-2.5 5.55-5.55C21.97 6.01 17.46 2 12 2Z" /></svg>
+                            <span class="nav-control-label">Accent</span>
+                        </button>
+                        <div id="theme-gadget" class="theme-gadget" aria-hidden="true">
+                            <div class="tg-header"><div class="tg-title"><span class="tg-line"></span> Theme color</div><div class="tg-actions">
+                                <button id="tg-reset" class="tg-reset" type="button" title="Reset theme color" aria-label="Reset theme color"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg></button>
+                                <output id="tg-value" class="tg-value" for="tg-slider">217</output>
+                            </div></div>
+                            <label class="sr-only" for="tg-slider">Theme color hue</label><input type="range" id="tg-slider" class="tg-slider" min="0" max="360" value="217">
+                        </div>
+                    </div>
+                    {{- if not site.Params.disableThemeToggle }}
+                    <button id="theme-toggle" type="button" accesskey="t" title="Toggle light and dark theme" aria-label="Toggle light and dark theme">
+                        <svg id="moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" /></svg>
+                        <svg id="sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></svg>
+                        <span class="nav-control-label">Theme</span>
+                    </button>{{- end }}
+                    {{- if not site.Params.disableLangToggle }}{{- $lang := .Lang }}{{- with site.Home.Translations }}
+                    <ul class="lang-switch" aria-label="Language">{{- range . }}{{- if ne $lang .Lang }}<li><a href="{{ .RelPermalink }}" title="{{ .Language.Params.languageAltTitle | default (.Language.LanguageName | emojify) | default (.Lang | title) }}" aria-label="{{ .Language.LanguageName | default (.Lang | title) }}">{{ if and site.Params.displayFullLangName .Language.LanguageName }}{{ .Language.LanguageName | emojify }}{{ else }}{{ .Lang | title }}{{ end }}</a></li>{{- end }}{{- end }}</ul>
+                    {{- end }}{{- end }}
+                </div>
             </div>
         </div>
-        {{- $currentPage := . }}
-        <ul id="menu">
-            {{- range site.Menus.main }}
-            {{- $menu_item_url := (cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL) ) | absLangURL }}
-            {{- $page_url:= $currentPage.Permalink | absLangURL }}
-            {{- $is_search := eq (site.GetPage .KeyName).Layout `search` }}
-            <li>
-                <a href="{{ .URL | absLangURL }}" title="{{ .Title | default .Name }} {{- cond $is_search (" (Alt + /)" | safeHTMLAttr) ("" | safeHTMLAttr ) }}"
-                {{- cond $is_search (" accesskey=/" | safeHTMLAttr) ("" | safeHTMLAttr ) }}>
-                    <span {{- if eq $menu_item_url $page_url }} class="active" {{- end }}>
-                        {{- .Pre }}
-                        {{- .Name -}}
-                        {{ .Post -}}
-                    </span>
-                    {{- if (findRE "://" .URL) }}&nbsp;
-                    <svg fill="none" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round"
-                        stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="12" width="12">
-                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
-                        <path d="M15 3h6v6"></path>
-                        <path d="M10 14L21 3"></path>
-                    </svg>
-                    {{- end }}
-                </a>
-            </li>
-            {{- end }}
-        </ul>
+        <noscript><style>@media (max-width:760px){.site-nav .nav-menu-toggle{display:none}.site-nav .nav-panel{position:static;display:flex;box-shadow:none}}</style></noscript>
     </nav>
 </header>

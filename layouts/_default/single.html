@@ -2,7 +2,9 @@
 
 <article class="post-single">
   <header class="post-header">
+    {{- if eq .Section "posts" }}
     {{ partial "breadcrumbs.html" . }}
+    {{- end }}
     
     <div class="custom-meta-top">
       {{- if (.Param "ShowWordCount") -}}
@@ -71,10 +73,10 @@
     {{- if and (gt (len $pages) 1) (in $pages . ) }}
     <nav class="paginav paginav-header">
       {{- with $pages.Next . }}
-      <a class="prev" href="{{ .Permalink }}">
+      <a class="prev" href="{{ .RelPermalink }}">
         <span class="nav-arrow arrow-left">←</span>
         <div class="nav-content">
-          <span class="nav-label">Older</span>
+          <span class="nav-label">Right</span>
           <span class="nav-name">{{- .Name -}}</span>
         </div>
       </a>
@@ -82,16 +84,16 @@
       <div class="paginav-dead">
         <span class="nav-arrow">←</span>
         <div class="nav-content">
-          <span class="nav-label">Older</span>
+          <span class="nav-label">Right</span>
           <span class="nav-name">No more posts</span>
         </div>
       </div>
       {{- end }}
 
       {{- with $pages.Prev . }}
-      <a class="next" href="{{ .Permalink }}">
+      <a class="next" href="{{ .RelPermalink }}">
         <div class="nav-content">
-          <span class="nav-label">Newer</span>
+          <span class="nav-label">Left</span>
           <span class="nav-name">{{- .Name -}}</span>
         </div>
         <span class="nav-arrow arrow-right">→</span>
@@ -99,7 +101,7 @@
       {{- else }}
       <div class="paginav-dead next">
         <div class="nav-content">
-          <span class="nav-label">Newer</span>
+          <span class="nav-label">Left</span>
           <span class="nav-name">No more posts</span>
         </div>
         <span class="nav-arrow">→</span>
@@ -119,14 +121,67 @@
     {{/* TOC lives in the LEFT gutter — col 1 */}}
     {{- if (.Param "ShowToc") }}
     {{- $toc := .TableOfContents -}}
-    {{- $hasToc := gt (len (findRE "<li>" $toc 1)) 0 -}}
+    {{- $tocItems := findRE "<li>" $toc -}}
+    {{- $hasToc := gt (len $tocItems) 0 -}}
     {{- if $hasToc }}
-    <aside class="toc-sidebar">
-      <div class="toc-sticky">
-        <h3>Table of Contents</h3>
-        {{ $toc }}
-      </div>
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <details class="toc-sticky" open>
+        <summary class="toc-summary">
+          <span class="toc-heading">Table of Contents</span>
+          <svg class="toc-chevron" viewBox="0 0 12 8" aria-hidden="true">
+            <path d="m1 1.5 5 5 5-5" />
+          </svg>
+        </summary>
+        <div class="toc-panel">
+          {{ $toc }}
+        </div>
+      </details>
     </aside>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const toc = document.querySelector(".toc-sticky");
+        if (!toc) return;
+
+        if (window.matchMedia("(max-width: 1100px)").matches) {
+          toc.removeAttribute("open");
+        }
+
+        const items = [...toc.querySelectorAll("#TableOfContents a[href^='#']")]
+          .map((link) => {
+            const id = decodeURIComponent(link.hash.slice(1));
+            return { link, heading: document.getElementById(id) };
+          })
+          .filter((item) => item.heading);
+
+        if (!items.length) return;
+
+        let framePending = false;
+        const syncCurrentSection = () => {
+          const readingLine = Math.min(180, window.innerHeight * 0.3);
+          let current = items[0];
+
+          for (const item of items) {
+            if (item.heading.getBoundingClientRect().top <= readingLine) current = item;
+            else break;
+          }
+
+          for (const item of items) item.link.removeAttribute("aria-current");
+          current.link.setAttribute("aria-current", "location");
+          framePending = false;
+        };
+
+        const requestSync = () => {
+          if (framePending) return;
+          framePending = true;
+          window.requestAnimationFrame(syncCurrentSection);
+        };
+
+        syncCurrentSection();
+        window.addEventListener("scroll", requestSync, { passive: true });
+        window.addEventListener("resize", requestSync);
+        window.addEventListener("hashchange", requestSync);
+      });
+    </script>
     {{- end }}
     {{- end }}
 
@@ -147,7 +202,7 @@
     {{- $tags := .Language.Params.Taxonomies.tag | default "tags" }}
     <ul class="post-tags">
       {{- range ($.GetTerms $tags) }}
-      <li><a href="{{ .Permalink }}">{{ .LinkTitle }}</a></li>
+      <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
       {{- end }}
     </ul>
     {{- if (.Param "ShowPostNavLinks") }}

@@ -2,7 +2,7 @@
 {{- if and (gt (len $pages) 1) (in $pages . ) }}
 <nav class="paginav">
   {{- with $pages.Next . }}
-  <a class="prev" href="{{ .Permalink }}">
+  <a class="prev" href="{{ .RelPermalink }}">
     <span class="nav-arrow arrow-left">←</span>
     <div class="nav-content">
       <span class="nav-label">Older</span>
@@ -20,7 +20,7 @@
   {{- end }}
 
   {{- with $pages.Prev . }}
-  <a class="next" href="{{ .Permalink }}">
+  <a class="next" href="{{ .RelPermalink }}">
     <div class="nav-content">
       <span class="nav-label">Newer</span>
       <span class="nav-name">{{- .Name -}}</span>

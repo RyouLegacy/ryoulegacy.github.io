@@ -1,0 +1,27 @@
+{{- define "main" }}
+{{- $type := .Type -}}
+{{- $terms := .Data.Terms.Alphabetical -}}
+<section class="topic-registry" aria-labelledby="topic-registry-title">
+    <header class="topic-registry-hero">
+        <div class="endpoint-heading">
+            <h1 id="topic-registry-title">TAGS</h1>
+            <p>Things I keep coming back to.</p>
+        </div>
+    </header>
+
+    <ul class="topic-directory" aria-label="Research topics">
+        {{- range $term := $terms -}}
+        {{- $name := .Name -}}
+        {{- $count := .Count -}}
+        {{- with site.GetPage (printf "/%s/%s" $type $name) -}}
+        <li>
+            <a href="{{ .RelPermalink }}">
+                <span class="topic-directory-name"><span aria-hidden="true">#</span>{{ .LinkTitle }}</span>
+                <span class="topic-directory-count">{{ $count }} {{ cond (eq $count 1) "note" "notes" }}</span>
+            </a>
+        </li>
+        {{- end -}}
+        {{- end -}}
+    </ul>
+</section>
+{{- end }}

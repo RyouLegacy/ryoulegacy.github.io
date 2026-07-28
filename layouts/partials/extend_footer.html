@@ -1,25 +1,32 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // ── Theme palette ──
     const paletteBtn = document.getElementById('palette-toggle');
     const gadget = document.getElementById('theme-gadget');
     const slider = document.getElementById('tg-slider');
     const valueDisplay = document.getElementById('tg-value');
     const resetButton = document.getElementById('tg-reset');
     const root = document.documentElement;
+    const defaultAccentHue = getComputedStyle(root).getPropertyValue('--site-accent-hue').trim() || '217';
+
+    const setPaletteOpen = (isOpen) => {
+        if (!paletteBtn || !gadget) return;
+        gadget.classList.toggle('show', isOpen);
+        gadget.setAttribute('aria-hidden', String(!isOpen));
+        paletteBtn.setAttribute('aria-expanded', String(isOpen));
+    };
 
     if (paletteBtn && gadget) {
-        paletteBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            gadget.classList.toggle('show');
+        paletteBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            setPaletteOpen(!gadget.classList.contains('show'));
         });
-        document.addEventListener('click', (e) => {
-            if (!gadget.contains(e.target)) gadget.classList.remove('show');
+        document.addEventListener('click', (event) => {
+            if (!gadget.contains(event.target)) setPaletteOpen(false);
         });
     }
 
     const updateTheme = (hue) => {
-        root.style.setProperty('--primary', `hsl(${hue}, 80%, 65%)`);
+        root.style.setProperty('--site-accent-hue', hue);
         if (valueDisplay) valueDisplay.textContent = hue;
         localStorage.setItem('custom-theme-hue', hue);
     };
@@ -28,18 +35,51 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedHue !== null && slider) {
         slider.value = savedHue;
         updateTheme(savedHue);
+    } else {
+        if (slider) slider.value = defaultAccentHue;
+        if (valueDisplay) valueDisplay.textContent = defaultAccentHue;
     }
 
-    if (slider) slider.addEventListener('input', (e) => updateTheme(e.target.value));
+    if (slider) slider.addEventListener('input', (event) => updateTheme(event.target.value));
 
     if (resetButton) {
-        resetButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            root.style.removeProperty('--primary');
+        resetButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            root.style.removeProperty('--site-accent-hue');
             localStorage.removeItem('custom-theme-hue');
-            if (slider) slider.value = 0;
-            if (valueDisplay) valueDisplay.textContent = '0';
+            if (slider) slider.value = defaultAccentHue;
+            if (valueDisplay) valueDisplay.textContent = defaultAccentHue;
         });
     }
+
+    const menuShell = document.querySelector('.nav-menu-shell');
+    const menuToggle = document.querySelector('.nav-menu-toggle');
+    if (menuShell && menuToggle) {
+        const setMenuOpen = (isOpen) => {
+            menuShell.classList.toggle('is-open', isOpen);
+            menuToggle.setAttribute('aria-expanded', String(isOpen));
+        };
+        menuToggle.addEventListener('click', () => setMenuOpen(!menuShell.classList.contains('is-open')));
+        menuShell.querySelectorAll('#menu a').forEach((link) => {
+            link.addEventListener('click', () => {
+                if (window.matchMedia('(max-width: 760px)').matches) setMenuOpen(false);
+            });
+        });
+        document.addEventListener('click', (event) => {
+            if (window.matchMedia('(max-width: 760px)').matches && !menuShell.contains(event.target)) setMenuOpen(false);
+        });
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        if (gadget && gadget.classList.contains('show')) {
+            setPaletteOpen(false);
+            paletteBtn.focus();
+        } else if (menuShell && menuShell.classList.contains('is-open') && window.matchMedia('(max-width: 760px)').matches) {
+            menuShell.classList.remove('is-open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            menuToggle.focus();
+        }
+    });
 });
 </script>

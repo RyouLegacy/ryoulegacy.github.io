@@ -39,6 +39,10 @@ params:
   env: production
   author: "Trần Anh Thi"
 
+  # Navigation brand text. Change this value to rename the visible site mark.
+  label:
+    text: "Ryou"
+
   math: true
 
   # UseHugoToc: false

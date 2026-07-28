@@ -3,7 +3,7 @@ title: "HKCERT"
 date: 2026-02-14
 draft: false
 description: Solution for Reverse Engineering's HKCERT challenge
-tags: ["Reverse Engineering", "Cryptography", "Obfuscated"]
+tags: ["Reverse", "Crypto", "Obfuscated"]
 ---
 
 # Findkey
