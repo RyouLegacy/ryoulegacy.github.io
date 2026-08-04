@@ -2980,3 +2980,336 @@ html:not([data-theme="dark"]) .copy-code {
         min-height: 36px;
     }
 }
+
+/* ==========================================================
+   MARKDOWN CALLOUTS
+   NOTE, TIP, IMPORTANT, WARNING, CAUTION
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   Base callout layout
+   ---------------------------------------------------------- */
+
+.post-content .callout {
+    box-sizing: border-box;
+    margin: 1.6rem 0;
+    padding: 1rem 1.1rem;
+
+    color: var(--callout-text);
+    background: var(--callout-bg);
+
+    border: 1px solid var(--callout-border);
+    border-inline-start: 4px solid var(--callout-accent);
+    border-radius: 12px;
+
+    box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+    overflow-wrap: anywhere;
+}
+
+/* Remove PaperMod's normal blockquote appearance. */
+.post-content aside.callout {
+    font-style: normal;
+}
+
+/* ----------------------------------------------------------
+   Heading and icon
+   ---------------------------------------------------------- */
+
+.post-content .callout-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+
+    margin: 0 0 0.65rem;
+    padding: 0;
+
+    color: var(--callout-title);
+    font-size: 1rem;
+    font-weight: 750;
+    line-height: 1.35;
+}
+
+.post-content .callout-title {
+    color: inherit;
+    font: inherit;
+    letter-spacing: 0.005em;
+}
+
+.post-content .callout-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+
+    width: 1.35rem;
+    height: 1.35rem;
+
+    color: var(--callout-accent);
+}
+
+.post-content .callout-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ----------------------------------------------------------
+   Body text
+   Higher specificity prevents global post text rules from
+   overriding callout colors.
+   ---------------------------------------------------------- */
+
+.post-content .callout .callout-content,
+.post-content .callout .callout-content p,
+.post-content .callout .callout-content li,
+.post-content .callout .callout-content blockquote,
+.post-content .callout .callout-content table,
+.post-content .callout .callout-content td,
+.post-content .callout .callout-content th {
+    color: var(--callout-text);
+}
+
+.post-content .callout .callout-content {
+    line-height: inherit;
+}
+
+.post-content .callout .callout-content > :first-child {
+    margin-top: 0;
+}
+
+.post-content .callout .callout-content > :last-child {
+    margin-bottom: 0;
+}
+
+/* Lists inside callouts */
+.post-content .callout .callout-content ul,
+.post-content .callout .callout-content ol {
+    margin-top: 0.65rem;
+    margin-bottom: 0.65rem;
+}
+
+/* Links inside callouts */
+.post-content .callout .callout-content a {
+    color: var(--callout-link);
+    text-decoration-color:
+        color-mix(in srgb, var(--callout-link) 45%, transparent);
+}
+
+.post-content .callout .callout-content a:hover {
+    color: var(--callout-link-hover);
+    text-decoration-color: currentColor;
+}
+
+/* Inline code only; code blocks retain your normal syntax theme. */
+.post-content .callout :not(pre) > code {
+    padding: 0.14em 0.38em;
+
+    color: var(--callout-code-text);
+    background: var(--callout-code-bg);
+
+    border: 1px solid var(--callout-code-border);
+    border-radius: 5px;
+}
+
+/* Nested blockquote */
+.post-content .callout .callout-content blockquote {
+    margin: 0.8rem 0;
+    padding: 0.2rem 0 0.2rem 0.9rem;
+
+    background: transparent;
+    border-inline-start:
+        3px solid
+        color-mix(in srgb, var(--callout-accent) 45%, transparent);
+}
+
+/* ----------------------------------------------------------
+   LIGHT THEME
+   Neutral body text + restrained tinted backgrounds
+   ---------------------------------------------------------- */
+
+/* NOTE — blue */
+.post-content .callout-note {
+    --callout-accent: #3478d4;
+    --callout-bg: #f3f7fd;
+    --callout-border: #cbd9ec;
+    --callout-title: #245fae;
+    --callout-text: #283442;
+
+    --callout-link: #245fae;
+    --callout-link-hover: #184780;
+
+    --callout-code-bg: #e6eef9;
+    --callout-code-border: #d1deef;
+    --callout-code-text: #24466f;
+}
+
+/* TIP — green */
+.post-content .callout-tip {
+    --callout-accent: #25855d;
+    --callout-bg: #f2f9f5;
+    --callout-border: #c7e2d4;
+    --callout-title: #176b49;
+    --callout-text: #27372f;
+
+    --callout-link: #176b49;
+    --callout-link-hover: #0f5036;
+
+    --callout-code-bg: #e2f0e9;
+    --callout-code-border: #cae3d6;
+    --callout-code-text: #19583f;
+}
+
+/* IMPORTANT — purple */
+.post-content .callout-important {
+    --callout-accent: #7a57bd;
+    --callout-bg: #f7f4fc;
+    --callout-border: #dbd0ee;
+    --callout-title: #6542a7;
+    --callout-text: #332e3d;
+
+    --callout-link: #6542a7;
+    --callout-link-hover: #4d3180;
+
+    --callout-code-bg: #ece6f7;
+    --callout-code-border: #ddd2ef;
+    --callout-code-text: #543985;
+}
+
+/* WARNING — amber */
+.post-content .callout-warning {
+    --callout-accent: #bc760d;
+    --callout-bg: #fff9ee;
+    --callout-border: #ead5ae;
+    --callout-title: #945b08;
+    --callout-text: #3b3327;
+
+    --callout-link: #945b08;
+    --callout-link-hover: #704304;
+
+    --callout-code-bg: #f7ead2;
+    --callout-code-border: #ead9ba;
+    --callout-code-text: #744a0d;
+}
+
+/* CAUTION — red */
+.post-content .callout-caution {
+    --callout-accent: #c84c59;
+    --callout-bg: #fff5f6;
+    --callout-border: #eac9cd;
+    --callout-title: #a93643;
+    --callout-text: #3d2d30;
+
+    --callout-link: #a93643;
+    --callout-link-hover: #812732;
+
+    --callout-code-bg: #f5e3e6;
+    --callout-code-border: #e9cfd3;
+    --callout-code-text: #892f39;
+}
+
+/* ----------------------------------------------------------
+   DARK THEME
+   Dark neutral surfaces + brighter headings
+   ---------------------------------------------------------- */
+
+/* NOTE — blue */
+:root[data-theme="dark"] .post-content .callout-note {
+    --callout-accent: #78aef5;
+    --callout-bg: #18202b;
+    --callout-border: #35445a;
+    --callout-title: #90bdf8;
+    --callout-text: #e5eaf0;
+
+    --callout-link: #9bc5ff;
+    --callout-link-hover: #c4dcff;
+
+    --callout-code-bg: #242f3f;
+    --callout-code-border: #334157;
+    --callout-code-text: #d7e6fa;
+}
+
+/* TIP — green */
+:root[data-theme="dark"] .post-content .callout-tip {
+    --callout-accent: #69c99b;
+    --callout-bg: #16231e;
+    --callout-border: #324a40;
+    --callout-title: #82d8af;
+    --callout-text: #e5ede9;
+
+    --callout-link: #8de0b8;
+    --callout-link-hover: #b8efd3;
+
+    --callout-code-bg: #21342c;
+    --callout-code-border: #304a3e;
+    --callout-code-text: #cef0de;
+}
+
+/* IMPORTANT — purple */
+:root[data-theme="dark"] .post-content .callout-important {
+    --callout-accent: #b596e9;
+    --callout-bg: #211c2b;
+    --callout-border: #493b5e;
+    --callout-title: #c5a9f2;
+    --callout-text: #ebe8f0;
+
+    --callout-link: #ceb5f7;
+    --callout-link-hover: #e1d2fb;
+
+    --callout-code-bg: #302840;
+    --callout-code-border: #46395c;
+    --callout-code-text: #e1d5f5;
+}
+
+/* WARNING — amber */
+:root[data-theme="dark"] .post-content .callout-warning {
+    --callout-accent: #e4b55e;
+    --callout-bg: #282116;
+    --callout-border: #554727;
+    --callout-title: #efc876;
+    --callout-text: #efeae1;
+
+    --callout-link: #f1cd82;
+    --callout-link-hover: #f7dfad;
+
+    --callout-code-bg: #39301f;
+    --callout-code-border: #55482c;
+    --callout-code-text: #f5ddb0;
+}
+
+/* CAUTION — red */
+:root[data-theme="dark"] .post-content .callout-caution {
+    --callout-accent: #ed818d;
+    --callout-bg: #2a1b1e;
+    --callout-border: #59353b;
+    --callout-title: #f0939d;
+    --callout-text: #f0e8e9;
+
+    --callout-link: #f49da7;
+    --callout-link-hover: #f8c2c8;
+
+    --callout-code-bg: #3c272b;
+    --callout-code-border: #57373d;
+    --callout-code-text: #f8d1d5;
+}
+
+/* ----------------------------------------------------------
+   Mobile
+   ---------------------------------------------------------- */
+
+@media (max-width: 600px) {
+    .post-content .callout {
+        margin: 1.35rem 0;
+        padding: 0.9rem 0.95rem;
+        border-radius: 10px;
+    }
+
+    .post-content .callout-heading {
+        font-size: 0.96rem;
+    }
+}

@@ -1,69 +1,50 @@
 {{- with site.Params.profileMode -}}
 {{- $posts := where site.RegularPages "Section" "posts" -}}
-{{- $recent := first 3 $posts.ByDate.Reverse -}}
-<section class="home-research" aria-labelledby="home-title">
-    <div class="home-hero">
-        <div class="home-hero-copy">
-            <h1 id="home-title">Hellooo</h1>
-            <p class="home-lede">Reverse engineering, CTFs, and things worth taking apart</p>
-
-            <div class="home-actions" aria-label="Explore the site">
-                <a class="home-action" href="{{ "posts/" | relLangURL }}">
-                    <span>Go to posts</span>
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                </a>
-                <a class="home-action" href="{{ "tags/" | relLangURL }}"><span>Go to tags</span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></a>
-            </div>
+{{- $recent := first 4 $posts.ByDate.Reverse -}}
+<section class="journal-home" aria-labelledby="home-title">
+    <header class="journal-intro">
+        <div class="journal-avatar">
+            {{- if .imageUrl -}}
+            {{- $img := "" -}}
+            {{- if not (urls.Parse .imageUrl).IsAbs }}{{- $img = resources.Get .imageUrl -}}{{- end -}}
+            {{- if $img -}}
+                {{- $processableFormats := slice "jpg" "jpeg" "png" "tif" "bmp" "gif" -}}
+                {{- if hugo.IsExtended }}{{- $processableFormats = $processableFormats | append "webp" -}}{{- end -}}
+                {{- if and (in $processableFormats $img.MediaType.SubType) (or hugo.IsProduction (eq site.Params.env "production")) -}}
+                    {{- $img = $img.Resize (printf "%dx%d" (.imageWidth | default 150) (.imageHeight | default 150)) -}}
+                {{- end -}}
+                <img draggable="false" src="{{ $img.Permalink }}" alt="{{ .imageTitle | default "Ryou profile illustration" }}" width="{{ .imageWidth | default 150 }}" height="{{ .imageHeight | default 150 }}">
+            {{- else -}}
+                <img draggable="false" src="{{ .imageUrl | absURL }}" alt="{{ .imageTitle | default "Ryou profile illustration" }}" width="{{ .imageWidth | default 150 }}" height="{{ .imageHeight | default 150 }}">
+            {{- end -}}
+            {{- end -}}
+            <span class="journal-status" aria-label="Currently active"><span aria-hidden="true"></span>active</span>
         </div>
 
-        <aside class="home-identity" aria-label="Author profile">
-            <div class="home-avatar-shell">
-                {{- if .imageUrl -}}
-                {{- $img := "" -}}
-                {{- if not (urls.Parse .imageUrl).IsAbs }}{{- $img = resources.Get .imageUrl -}}{{- end -}}
-                {{- if $img -}}
-                    {{- $processableFormats := slice "jpg" "jpeg" "png" "tif" "bmp" "gif" -}}
-                    {{- if hugo.IsExtended }}{{- $processableFormats = $processableFormats | append "webp" -}}{{- end -}}
-                    {{- if and (in $processableFormats $img.MediaType.SubType) (or hugo.IsProduction (eq site.Params.env "production")) -}}
-                        {{- $img = $img.Resize (printf "%dx%d" (.imageWidth | default 150) (.imageHeight | default 150)) -}}
-                    {{- end -}}
-                    <img draggable="false" src="{{ $img.Permalink }}" alt="{{ .imageTitle | default "Ryou profile illustration" }}" width="{{ .imageWidth | default 150 }}" height="{{ .imageHeight | default 150 }}">
-                {{- else -}}
-                    <img draggable="false" src="{{ .imageUrl | absURL }}" alt="{{ .imageTitle | default "Ryou profile illustration" }}" width="{{ .imageWidth | default 150 }}" height="{{ .imageHeight | default 150 }}">
-                {{- end -}}
-                {{- end -}}
-                <span class="home-status" aria-label="Currently active"><span aria-hidden="true"></span>active</span>
+        <div class="journal-intro-copy">
+            <h1 class="journal-lede" id="home-title">Reverse engineering, CTFs, and things worth taking apart.</h1>
+            <div class="journal-profile-meta">
+                <p class="journal-identity"><strong>{{ .title | default site.Title | markdownify }}</strong><span aria-hidden="true">&middot;</span>{{ .subtitle | markdownify }}</p>
+                <div class="journal-socials" aria-label="Social links">
+                    {{- partial "social_icons.html" -}}
+                </div>
             </div>
-            <div class="home-identity-copy">
-                <p class="home-handle">{{ .title | default site.Title | markdownify }}</p>
-                <p>{{ .subtitle | markdownify }}</p>
-                {{- partial "social_icons.html" -}}
-            </div>
-        </aside>
-    </div>
+        </div>
+    </header>
 
     {{- if $recent -}}
-    <section class="home-latest" aria-labelledby="latest-notes-title">
-        <header class="home-section-heading">
-            <div>
-                <h2 id="latest-notes-title">Latest posts</h2>
-            </div>
-            <a href="{{ "posts/" | relLangURL }}">See all posts <span aria-hidden="true">→</span></a>
+    <section class="journal-home-posts" aria-labelledby="latest-posts-title">
+        <header class="journal-section-heading">
+            <h2 id="latest-posts-title">Latest posts</h2>
+            <a href="{{ "posts/" | relLangURL }}">All posts <span aria-hidden="true">&rarr;</span></a>
         </header>
-        <ol class="home-note-list">
+        <ol class="journal-home-list">
             {{- range $page := $recent -}}
             <li>
-                {{- $summary := .Params.description | default .Summary -}}
-                <article class="home-note">
+                <article>
                     <a href="{{ .RelPermalink }}">
-                        <span class="home-note-meta">
-                            <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
-                            <span>{{ .ReadingTime }} min read</span>
-                        </span>
-                        <span class="home-note-copy">
-                            <span class="home-note-title">{{ .Title }}</span>
-                            {{- with $summary }}<span class="home-note-summary">{{ . | plainify | htmlUnescape | truncate 145 }}</span>{{- end }}
-                        </span>
+                        <span>{{ .Title }}</span>
+                        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02 Jan 2006" }}</time>
                     </a>
                 </article>
             </li>

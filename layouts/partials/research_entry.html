@@ -1,36 +1,18 @@
 {{- $page := . -}}
 {{- $summary := $page.Params.description | default $page.Summary -}}
-{{- $author := $page.Params.author | default site.Params.profileMode.title | default site.Title -}}
-{{- $authorType := printf "%T" $author -}}
-{{- $authorLabel := $author -}}
-{{- if or (eq $authorType "[]string") (eq $authorType "[]interface {}") -}}
-    {{- $authorLabel = delimit $author ", " -}}
-{{- end -}}
-{{- $avatar := "" -}}
-{{- with site.Params.profileMode.imageUrl -}}
-    {{- $avatar = resources.Get . -}}
-{{- end -}}
-
-<article class="research-card">
-    <div class="research-card-body">
+<article class="journal-entry">
+    {{- if not $page.Date.IsZero }}
+    <time class="journal-entry-date" datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "02 Jan" }}</time>
+    {{- end }}
+    <div class="journal-entry-body">
         <h3><a href="{{ $page.RelPermalink }}">{{ $page.Title | default "Untitled note" }}</a></h3>
-        {{- with $summary }}<p class="research-card-summary">{{ . | plainify | htmlUnescape | truncate 190 }}</p>{{- end }}
+        {{- with $summary }}<p class="journal-entry-summary">{{ . | plainify | htmlUnescape | truncate 155 }}</p>{{- end }}
 
-        <div class="research-card-byline">
-            <span class="research-card-author">
-                {{- with $avatar -}}
-                <img src="{{ .RelPermalink }}" alt="" width="24" height="24" loading="lazy">
-                {{- else -}}
-                <span class="research-card-author-mark" aria-hidden="true">{{ substr (printf "%v" $authorLabel) 0 1 | upper }}</span>
-                {{- end -}}
-                <span>{{ $authorLabel }}</span>
-            </span>
-            {{- if not $page.Date.IsZero }}<span class="research-meta-separator" aria-hidden="true">·</span><time datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "January 2, 2006" }}</time>{{- end }}
-            {{- if and site.Params.ShowReadingTime $page.ReadingTime }}<span class="research-meta-separator" aria-hidden="true">·</span><span>{{ $page.ReadingTime }} min read</span>{{- end }}
+        <div class="journal-entry-meta">
+            {{- if and site.Params.ShowReadingTime $page.ReadingTime }}<span>{{ $page.ReadingTime }} min read</span>{{- end }}
             {{- if $page.Draft }}<span class="research-draft">Draft</span>{{- end }}
-
             {{- with $page.Params.tags }}
-            <ul class="research-tags" aria-label="Tags">
+            <ul class="journal-entry-tags" aria-label="Tags">
                 {{- range . }}<li><a href="{{ "tags/" | relLangURL }}{{ . | urlize }}/"><span aria-hidden="true">#</span>{{ . }}</a></li>{{- end }}
             </ul>
             {{- end }}

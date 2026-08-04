@@ -3,12 +3,12 @@ title: "HKCERT"
 date: 2026-02-14
 draft: false
 description: Solution for Reverse Engineering's HKCERT challenge
-tags: ["Reverse", "Crypto", "Obfuscated"]
+tags: ["Reverse", "Crypto", "Obfuscated", "CTF"]
 ---
 
-# Findkey
+### Findkey
 
-## Analyze
+#### Analyze
 Bài này đã bị Obfuscate CFF + biểu thức toán vô nghĩa
 ![image](first.png)
 
@@ -696,7 +696,7 @@ Flag: flag{8579432268}
 
 ---
 
-## Update 
+### Update 
 Ở bài này có obfuscate CFF để làm rối
 Pattern của bài:
 1. Đầu tiên là các đoạn code chính sẽ nằm trong cùng một block

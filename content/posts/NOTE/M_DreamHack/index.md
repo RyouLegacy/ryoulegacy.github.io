@@ -8,25 +8,25 @@ tags: ["Reverse", "Obfuscated"]
 
 ### Troll branch
 
-Imma make this really quick because it is a fake flag
+I gonna make this real quick because this is a fake flag
 
-So basically there is multiple ELF embedded in the main binary, each binary, calls child, validate each 7 consecutive byte of a flag by using XTEA encryption and compare with the constant
+So basically there are multiple ELF binary files embedded in the main executable. Each ELF binary validates every 7 consecutive bytes of the flag by encrypting it with XTEA and comparing with the constant hard-coded in the binary
 
-The 7 consecutive byte is changed to 8 bytes by the encryption `a[i] = value + value / 255 + 1` and `value /= 255`
+The 7 consecutive bytes are changed into 8-byte sequence by this modification: `a[i] = variable + variable / 255 + 1` and `variable /= 255`
 
-We could reverse back the `value` by using this
-
-The `memfd_create -> fork -> fexecve` is pretty insane and new to me read the [Lesson Learnt](#lesson-learnt) for more information
+We could recover the `variable` by using these steps
 ```C
-value = 255 * k + r
-a[i] = (value + value / 255 + 1) % 256 
+variable = 255 * k + r
+a[i] = (variable + variable / 255 + 1) % 256 
      = (255 * k + r + k + 1) % 256 
      = (256 * k + r + 1) % 256 = r + 1
-=> value = 255 * k + a[i] - 1
-and K is the old value -> value = value * 255 + a[i] - 1
+=> variable = 255 * k + a[i] - 1
+Whereas K is the previous "variable" value
 ```
 
-In the solve script I used z3 because I'm lazy to think :D
+The `memfd_create -> fork -> fexecve` is pretty insane and new to me, read the [Lesson Learnt](#lesson-learnt) for more details
+
+In the solve script I used z3 because I was lazy to infer the reverse formula
 
 Solve script
 ```python 
@@ -141,7 +141,7 @@ with open('flag.png', 'wb') as f:
 
 -----------------------------------------------------------------------------------------
 ### Challenge Trick
-These are things you need to understand to figure out the author's trick. I'm pretty sure all of you guys know all this before but haven't taken any serious learnings of this, and... yeah so do I so we will see it together
+These are things you need to understand to figure out the author's trick. I'm pretty sure you guys already know these things before but haven't done any serious research on them, and yeah neither have I. So we will explore them together
 #### Relocation
 The structure of ELF64_Rela is
 ```C
@@ -152,23 +152,23 @@ struct ELF64_Rela {
 };
 ```
 For example: 
-R_X86_64_64: Write into r_offset value of Symbol's address + Addend
+R_X86_64_64: Write at offset `r_offset` the value of symbol's address + Addend
 Formula: `P = S + A`
 
 R_X86_64_COPY: Copy the symbol's actualy data into P
 Formula: `memcpy(P, S, sizeof(S))`
 
-R_X86_64_RELATIVE64: Write Base + Addend to r_offset
+R_X86_64_RELATIVE64: Write Base + Addend to offset `r_offset`
 Formula: `P = B + A`
 
-R_X86_64_GLOB_DAT: Write it's symbol's address at runtime to r_offset
+R_X86_64_GLOB_DAT: Write its symbol's address at runtime to offset `r_offset`
 Formula: `P = S`
 
-R_X86_64_PC32/64: Write to r_offset the 32-bit/64-bit relative distance from r_offset and the symbol with r_addend
+R_X86_64_PC32/64: Write to offset `r_offset` a 32-bit/64-bit displacement from `r_offset` to the symbol's address + r_addend
 Formula: `P = S + A - P`
 
 #### Symbol
-The structure of ELF64_Sym 
+The structure of ELF64_Sym is
 ```C
 struct ELF64_Sym {
     // index to string table for example .strtab for
@@ -189,7 +189,8 @@ struct ELF64_Sym {
     uint64_t st_size;
 };
 ```
-The `st_info` is important here, it is one-byte variable store two packed information, I will mention some of them and the important one only
+The `st_info` is important here. It is an one-byte variable storing two packed fields, I will mention only the important ones
+
 The high 4-bit is Binding
 1. STB_LOCAL (0) visible only inside object file
 2. STB_GLOBAL (1) visible to all object files being linked
@@ -201,19 +202,20 @@ The low 4-bit is Type
 3. STT_FUNC (2) Executable code / function
 4. STT_GNU_IFUNC (10) GNU IFUNC
 
-The import pivot we need to take a look is STB_WEAK and STT_GNU_IFUNC which could used to change the program control's flow or execution's flow deliberately
+The significant pivot we need to take a look is STB_WEAK and STT_GNU_IFUNC. They could be used to change the program execution flow deliberately
 
-When a program want to resolve an address of specific symbol, it first does these steps
-If the symbol is defined in current ELF, which usually mean `st_shndx != SHN_UNDEF`. It will get the value of `st_value` which is already resolved at the static linking phase by `ld.so`. Or using the return value of the shellcode stored at `st_value` (this happens when flag `STT_GNH_IFUNC` is enabled)
+When a program wants to resolve an address of a specific symbol, it does
 
-When a symbol is not defined, `st_name` is an offset to dynamic string table, and it will hunt for the address of that string globally across shared library
+Firstly if the symbol is defined in current binary, which usually means `st_shndx != SHN_UNDEF`, the program will get the value of `st_value` which is already resolved at the static linking phase by `ld.so`. Additionally, if `STT_GNH_IFUNC` flag is enabled, the shellcode stored at `st_value` will be trigger to resolve the address
+
+Secondly, if the symbol is not defined, the program will hunt for the symbol's address globally base on the string stored at index `st_name` in the dynamic string table
 
 #### LinkMap
-As you know in ELF there is a thing call Lazy binding, address of functions in shared library is dynamically resolved during the `ld.so` (could be lazily processed but still by `ld.so`) 
+As you know in ELF there is a thing called `Lazy Binding`. Because of this feature, the address of a function in shared library will be dynamically resolved by `ld.so` directly or whenever the function is being called.
 
-And those address is resolved and stored in GOT (Global Offset Table), whenever a program want to use a function, they will call an indirect stub, which is called PLT (procedure linkage table) which is used to lazily resolved GOT address and is used as an intermediate stub call GOT
+And the address is resolved and stored in GOT (Global Offset Table). Whenever a program wants to use a function, it calls an indirect stub called PLT (procedure linkage table) which is used to lazily resolved the GOT address or the PLT
 
-In GOT the first 3 element is special.
+In GOT, the first 3 elements are special.
 
 | Index | Meaning |
 | --- | --- |
@@ -221,13 +223,13 @@ In GOT the first 3 element is special.
 | GOT[1] | Store a pointer to link_map structure used by `ld.so` to track loaded object |
 | GOT[2] | Hold an address of dynamic runtime resolver `_dl_runtime_resolved`           |
 
-Alright these seem important but remembering it is unnecessary in some case, however in this challenge, the author abuse the GOT[1] to access the binary data before the main entry is actually executed
+Alright these seem important but remembering it is unnecessary in some case, however in this challenge, the author abuses the `GOT[1]` to access the binary data before a binary's entry point is actually executed
 
-There is a technique in term of exploiting called ret2dlresolve by using the appearence of GOT[0], if we are able to craft a fake index in `ELF64_Rela` or `ELF64_Sym` we could force the resolver blindly resolve our hijacked function for example `system()` to pop shell but now the part we want to mention is `link_map`
+There is a technique in terms of exploiting called ret2dlresolve by hijacking the `reloc_arg` passed through the `_dl_runtime_resolved`. We could manually control the function that `_dt_runtime_resolved` resolves
 
-Well taking about that would be taken a huge amount of time of me and you also, so we only mention about how the challenge abuse it, the appearence of it. If there is any other technique using it, we could take a research later
+Well talking about that would take a huge amount of time of me and you, so we only mention about how the challenge abuses it. If there is any other techniques using it, we could do research later
 
-So basically its layout
+So basically its layout is
 ```C
 struct link_map {
     /* 0x00 */ ElfW(Addr) l_addr;      // The ASLR slide (base address difference)
@@ -240,17 +242,17 @@ struct link_map {
 };
 ```
 
-`l_info` is using to cache the address to other dynamic section for example `l_info[DT_SYMTAB] -> .dynsym`
+`l_info` is using to cache the address of other dynamic sections. For example `l_info[DT_SYMTAB] -> .dynsym`
 
-`l_addr` often store loading bias, usually mean the difference between the default imagebase with the loaded compared to the ASLR. For example, it could be used to leak `libc base address` because `libc` declare its static base in ELF header is `0x0` so `loading bias = libc base` now
+`l_addr` often stores loading bias, usually means the difference between the actual loaded base address with the preferred base address. For example, It could be used to leak `libc base address` because `libc` declares its static base in ELF header is `0x0`. So `loading bias = libc base`
 
 -----------------------------------------------------------------------------------------
 ### The real one
 
-The general concept of this binary is leveraging the ability of relocation process that linker perform to hijack the binary, changes value and hide a hidden validation in each child program
+The general concept of this binary is leveraging the ability of the relocation process that linker performs to hide main the validation, 
 
 #### Suspicious Pivot
-The first think we could notice is a weird `rela.tivity` section. By inspecting it we could see it is used to modified the `DT_RELASZ` of each embedded binaries. This part is not really important in term of analyzing but throw a huge effect to the result of the challenge because the default embedded `DT_RELASZ` is not large enough to cover the whole hidden logic, so this part is used to expand. This is just a small obfuscation that could confuse us a little bit.
+The first thing that we could notice is a weird `rela.tivity` section. By inspecting it, we could see that it is used to modifty the `DT_RELASZ` of each embedded binary. This part is not really important in terms of analyzing but drive a huge effect to the result of the challenge because the default embedded `DT_RELASZ` is not large enough to cover the whole hidden logic. So this part is used to expand. This is just a small obfuscation that could confuse us a little bit.
 
 ```C
 ryou@Ryou:~/reverse/m_chall_dh$ readelf -SW main
@@ -272,18 +274,18 @@ Section Headers:
   ```
 Idk why I put this output here but yeah make it less "full text blog" 
 
-A truth is in each relocation section of child's program, it is redesigned to act like a simplified Virtual Machine that change the value of correct/wrong exit's variable of the challenge.
+The truth is that in each relocation section of child program, it is redesigned to act like a simplified Virtual Machine that changes the value of the exit status variable
 
-At first `wrong = 1/correct = 0` so the `exit()` will explicitly show the correct result if the `XTEA encrypted value` match the hard-coded value. However, after passing the hidden validation in the relocation phase, if the input is not satisify, the correct will be changed to 1 -> The program always return false. 
+At first `wrong = 1/correct = 0` so the `exit()` will explicitly show the correct result if the `XTEA encrypted value` match the hard-coded value. However, after passing the hidden validation in the relocation phase, if the input is not satisify, the correct will be changed to 1 -> The program always returns false. 
 
-So next wee need to validate each relocation in each binary child, however it must be definitely a pattern, so just need to analyze once, I will do with the `bin_0`
+So next we need to validate each relocation in each binary child. However it must be definitely a pattern, so we just need to analyze once. I will do with the first binary `bin_0`
 
 ---
 
 #### Analyze the relocation VM
-Well this time we need a little research now, this part abused the usage of link_map to access the hidden value in libc that stores information about argument. 
+Well at this point, we need to do a little research, The following part abuses the `link_map` to access a hidden value in `ld.so` that stores information about the arguments. 
 
-These following log is my translated instruction from relocating progress, with 4 relocation type
+The following logs are my translated instruction from the relocating progress, involving 4 relocation types
 
 ```C
 0x1005000    0x403fd8 = 0x0
@@ -304,32 +306,30 @@ These following log is my translated instruction from relocating progress, with 
 0x1005168    memcpy(0x804180, 0x0, 0x8)
 ```
 
-Let's analyze this shit carefully, sorry for my disassembler is such a mess but I don't know how to present it better.
+Let's analyze this shit carefully. Sorry, my disassembler is such a mess but I don't know how to demonstrate the logs better.
 
-Now first there is a repeated pattern you need to figure out
+Firstly, there is a repeated pattern you need to figure out
 ```C
-addr = value
-memcpy(addr, value, 0x8)
+symbol.st_value = addr
+memcpy(addr, symbol.st_value, 0x8)
 ```
-This mean retrieving 8-byte value at the address of value, and the value is also address because it is st_value of the ELF64_Sym
+This means to retrieve a 8-byte sequence at the address stored in `symbol.st_value`, then It will be copied into a specified address
 
-Because 0x403ff0 is pointing to `GOT[1]` in our binary, so it is iterating throw `link_map` 3 times
+Because `0x403ff0` is pointing to `GOT[1]` in our binary, it is iterating throw `link_map` 3 times
 > *(uint64_t *)link_map->l_next->l_next->l_next
 
-which means, it is getting base address in `ld.so` and then it adds with a suspicious offset `0x392d0` I don't know what is this either, but it after debugging it, following the chain it show this amazing result
-The value of `0x804180` is pointing to `argv[1]` which is our input!!!
+It is equivalently getting the base address of `ld.so`, and then adding with offset `0x392d0`. I don't know what this is either, but after debugging the program, it shows an incrediable result
+The value at `0x804180` is pointing to `argv[1]` which is our input
 
-After a few researchs, I have known that it is trying to obtain pointer into the initial process stack through loader/linker internal data, by calculating the base address of `ld.so` and after that adding it with offset `0x392d0`, we could leak the stack! Wow this is amazing the magic number `0x392d0` is insane, but should I remember this? Nah I just need to know there is such a magic like this, whenever I need it, I will find again
+After doing a few research, I have known that it is trying to obtain the pointer pointing into the initial process stack through loader/linker internal data, by calculating the base address of `ld.so` and after that adding it with offset `0x392d0`, we could leak the stack! Wow this is amazing the magic number `0x392d0` is insane, but should I remember this? Nah I just need to know there is such a magic like this, whenever I need it, I will find again
 
-Now we know 1 information that what `0x804180` is this is an enormous information because now instead of blindly read the disassembly code we could concentrate on hunting input modification branch
+Now we know one observation what `0x804180` is. This is an enormous data because instead of blindly translate the assembly code we could concentrate on hunting for the input modification branch
 
-There is a really weird part where that took me a lot of time to figure out (of course using AI, although my assumption about this was at first correct but I ignore it because it just a flash idea fly throw my mind lol). That is when I debug a program, I don't understand why a function with `0xA` flag which means `STT_GNU_IFUNC` is not executed, and the reason is the challenge set the `st_shndx` to zero
-
-The `st_shndx` to `ZERO` means it is not defined in current local binary and it is externed from shared library so `ld.so` think there is no resolver function for this. LOL
+There is a really weird part that took me a lot of time to figure out (of course using AI, although my assumption about this was at first correct but I ignored it because it just a flash idea flew throw my mind lol). That is, when I debug a program, I don't understand why a function with `0xA` flag enabled is not executed. The reason is the challenge set the `st_shndx` to zero (I mentioned the reason above)
 
 > To be honest, I don't know, knowing these things are actually helpful or not because I feel like it is way too specific toward this challenge and reflex a tiny applicatable benefits
 
-Well basically, when deal with such a challenge with high obfuscated this like, I'm guessing that this virtual machine is also scrambled and modifed to be taxing to comprehend (after suffering a lots). So I think reading purely each line will break our mind (tried T_T). So we need to lifting it to IR for easier analysis. 
+Well basically, when dealing with such a challenge highly obfuscated this like, I'm guessing that this virtual machine is also scrambled and modifed to be taxing to comprehend (after suffering a lots). So I think reading purely each line will break our mind (tried T_T). So we need to lifting it to IR for easier analysis. 
 
 So we need to recreate our interpreter to make it more clean and then we extract slightly each consecutive instruction and witness its repetition and merge it into a block with specific meaning.
 
@@ -371,7 +371,7 @@ JUMP to 0x1005948
 
 There is also another `JUMP` pattern (the not executed one). The clear signal we could figure out is setting `0x8040de` to zero we could also be able to lift this pattern and eliminate useless logs parallelly
 
-There is also a failed jump, just making it short and clear, decoy instruction for example setup variable, data is unnecessary if they're actually the same
+There is also a failed jump, just making it short and clear, decoy instruction for example setup variable, data is inessential if they're actually the same
 
 By merging respectively clear pattern with clean meaning we could understand what does this program do
 

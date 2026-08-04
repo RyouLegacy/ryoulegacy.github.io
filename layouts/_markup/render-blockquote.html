@@ -1,0 +1,88 @@
+{{- if eq .Type "alert" -}}
+
+  {{- $type := .AlertType | default "note" -}}
+
+  {{- $titles := dict
+    "note" "Note"
+    "tip" "Tip"
+    "important" "Important"
+    "warning" "Warning"
+    "caution" "Caution"
+  -}}
+
+  {{- $fallbackTitle := title $type -}}
+  {{- $defaultTitle := index $titles $type | default $fallbackTitle -}}
+  {{- $titleID := printf "callout-title-%d" .Ordinal -}}
+
+  <aside
+    class="callout callout-{{ $type }}"
+    role="note"
+    aria-labelledby="{{ $titleID }}"
+  >
+    <div class="callout-heading">
+      <span class="callout-icon" aria-hidden="true">
+
+        {{- if eq $type "tip" -}}
+          <!-- Light bulb -->
+          <svg viewBox="0 0 24 24">
+            <path d="M9 18h6"></path>
+            <path d="M10 22h4"></path>
+            <path d="M8.2 14.5A7 7 0 1 1 15.8 14.5C14.7 15.3 14 16.5 14 18h-4c0-1.5-.7-2.7-1.8-3.5Z"></path>
+          </svg>
+
+        {{- else if eq $type "important" -}}
+          <!-- Important circle -->
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 7v6"></path>
+            <path d="M12 17h.01"></path>
+          </svg>
+
+        {{- else if eq $type "warning" -}}
+          <!-- Warning triangle -->
+          <svg viewBox="0 0 24 24">
+            <path d="M10.3 4.1 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3L13.7 4.1a2 2 0 0 0-3.4 0Z"></path>
+            <path d="M12 9v4"></path>
+            <path d="M12 17h.01"></path>
+          </svg>
+
+        {{- else if eq $type "caution" -}}
+          <!-- Caution octagon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M7.8 2h8.4L22 7.8v8.4L16.2 22H7.8L2 16.2V7.8Z"></path>
+            <path d="m9 9 6 6"></path>
+            <path d="m15 9-6 6"></path>
+          </svg>
+
+        {{- else -}}
+          <!-- Note and fallback information icon -->
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 11v6"></path>
+            <path d="M12 7h.01"></path>
+          </svg>
+        {{- end -}}
+
+      </span>
+
+      <span class="callout-title" id="{{ $titleID }}">
+        {{- with .AlertTitle -}}
+          {{ . }}
+        {{- else -}}
+          {{ $defaultTitle }}
+        {{- end -}}
+      </span>
+    </div>
+
+    <div class="callout-content">
+      {{ .Text }}
+    </div>
+  </aside>
+
+{{- else -}}
+
+  <blockquote>
+    {{ .Text }}
+  </blockquote>
+
+{{- end -}}

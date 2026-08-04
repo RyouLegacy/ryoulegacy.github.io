@@ -3,17 +3,17 @@ title: "LACTF"
 date: 2026-02-14
 draft: false
 description: Interesting DOS challenge in LACTF
-tags: ["Reverse", "Crypto"]
+tags: ["Reverse", "Crypto", "CTF"]
 ---
 
-## lactf-1986
+### lactf-1986
 >Dug around the archives and found a floppy disk containing a long-forgotten LA CTF challenge. Perhaps you may be the first to solve it in decades.
 ### Overview
 This was a really fun challenge that I solved during LACTF 2026. The binary was programmed in a 16-bit x86 DOS environment, which immediately made the analysis more interesting. One of the main difficulties came from the limited tools available for analyzing this binary and converting it into a readable C-like pseudocode, instead we have to work directly with the raw low-level assembly code.
 
 The tools that I used to solve this challenge are DOSbox-x for debugging and radare2, IDA for disassembling
 
-### Reconnaissance
+#### Reconnaissance
 The challenge gives us only `CHALL.IMG` which is a floppy disk image file type
 ```bash 
 $ file CHALL.IMG
@@ -35,7 +35,7 @@ Floating-point support not loaded
 ```
 This is definitely a flag checker challenge
 
-### Analyze
+#### Analyze
 
 > I would not dive deeply into my really tough analyzing process, I will directly point to the correct path of this challenge.
 
@@ -347,5 +347,5 @@ for seed in range(1 << 20):
 
 ```
 
-### FLAG
+#### FLAG
 > lactf{3asy_3nough_7o_8rute_f0rce_bu7_n0t_ea5y_en0ugh_jus7_t0_brut3_forc3}
