@@ -206,7 +206,7 @@ The significant pivot we need to take a look is STB_WEAK and STT_GNU_IFUNC. They
 
 When a program wants to resolve an address of a specific symbol, it does
 
-Firstly if the symbol is defined in current binary, which usually means `st_shndx != SHN_UNDEF`, the program will get the value of `st_value` which is already resolved at the static linking phase by `ld.so`. Additionally, if `STT_GNH_IFUNC` flag is enabled, the shellcode stored at `st_value` will be trigger to resolve the address
+Firstly if the symbol is defined in current binary, which usually means `st_shndx != SHN_UNDEF`, the program will get the value of `st_value` which is already resolved at the static linking phase by `ld.so`. Additionally, if `STT_GNH_IFUNC` flag is enabled, the shellcode stored at `st_value` will be triggered to resolve the address
 
 Secondly, if the symbol is not defined, the program will hunt for the symbol's address globally base on the string stored at index `st_name` in the dynamic string table
 
@@ -329,9 +329,9 @@ There is a really weird part that took me a lot of time to figure out (of course
 
 > To be honest, I don't know, knowing these things are actually helpful or not because I feel like it is way too specific toward this challenge and reflex a tiny applicatable benefits
 
-Well basically, when dealing with such a challenge highly obfuscated this like, I'm guessing that this virtual machine is also scrambled and modifed to be taxing to comprehend (after suffering a lots). So I think reading purely each line will break our mind (tried T_T). So we need to lifting it to IR for easier analysis. 
+Well basically, when dealing with such a challenge highly obfuscated this like, I'm guessing that this virtual machine is also scrambled and modifed to be taxing to comprehend (after suffering a lots). So I think reading purely each line will break our mind (tried T_T). So we need to lift it to IR for easier analysis. 
 
-So we need to recreate our interpreter to make it more clean and then we extract slightly each consecutive instruction and witness its repetition and merge it into a block with specific meaning.
+So we need to reconstruct our interpreter to make it cleaner. Then we extract each consecutive instruction, observe its repetition and merge it into a block with specific meaning.
 
 For example
 ```C
@@ -339,9 +339,9 @@ For example
 next_reloc = 0x8041a0
 memcpy(0x8041a0, 0x8040b0, 0x1)
 ```
-This part could be totally lifted into
+This part could be completely lifted into
 ```C
-0x8041a0 = * (_BYTE *) 0x8040b0 // or we could replaced directly to the value at 0x8040b0 
+0x8041a0 = * (_BYTE *) 0x8040b0 // or we can replace this directly to the value at 0x8040b0 
 // because 0x8040b0 is just a temporary variable
 ```
 
@@ -359,23 +359,21 @@ Or this pattern
 ```
 
 Let's analyze this
-1. First it occupies the address of next function to `0x205b308` which is the `RWE`section to store shellcode
-2. Then it pulls shellcode and set the value of `st_shndx` to `0xc` (or any value that diff wth zeero) and execute it
-3. Then it will `0x404040` as an deliverer to execute the `STT_GNU_IFUNC` (and it always use `0x404040`)
+1. First it pushes the address of the next function to `0x205b308` which is the `RWE` section to store the shellcode
+2. Then it pulls shellcode, sets the value of `st_shndx` to `0xc` (or any value different with zeero) and executes it
+3. Then it will use `0x404040` as a deliverer to execute the `STT_GNU_IFUNC` (and it always uses `0x404040`)
 
-We can lift those to
+We can lift these to
 
 ```C
 JUMP to 0x1005948
 ```
 
-There is also another `JUMP` pattern (the not executed one). The clear signal we could figure out is setting `0x8040de` to zero we could also be able to lift this pattern and eliminate useless logs parallelly
+There is also another `JUMP` pattern (the unexecuted one). The clear signal we figured out the changes of `0x8040de` to zero. We could lift this pattern and simultaneously eliminate useless logs
 
-There is also a failed jump, just making it short and clear, decoy instruction for example setup variable, data is inessential if they're actually the same
+By combining all lifted logs, we can understand how the program implements the validation
 
-By merging respectively clear pattern with clean meaning we could understand what does this program do
-
-After merging pattern and lifting some basic blob I came up with this script
+I came up with this script in order to automate my lifting process
 ```python
 #!/usr/bin/env python3
 
@@ -626,44 +624,44 @@ flush()
 ```
 *pure human suffering btw*
 
-Btw just in case these steps took likely over 20 hours in total for trial and error hypothesis, writing script, analyzing IR so tough right?? ... I tried GPT and it solved within 60 minutes holy whats a funny joke
+In fact, trying hypotheses, writing scripts or reversing the logs took me over 20 hours. I was completely exhausted and drained. Whereas when I tried to solve it using GPT-5.5, it solved the challenge within 60 minutes... What a brutal joke
 
-You could download the raw log [Here](raw.txt), and the lifted/deobfuscated log [Here](clean.txt)
+You can download the raw log [here](raw.txt), and the lifted/deobfuscated log [here](clean.txt)
 
 So basically the validation is
 > 1. It first generates a target array stored in 0x804198 -> 0x80419f
-> 2. It generates a constant array call `addend[i]` at 0x804190 -> 0x804197
+> 2. It generates a constant array called `addend[i]` at 0x804190 -> 0x804197
 > 3. It stores its transformed input into 0x804188 -> 0x80418f
 > 4. The transformation formula is `res[i] = 7 * input[i] + addend[i]` 
-> 5. Then it check with the target array
+> 5. Then it compares with the target array
 
-So far we only need these information, hunting for how the program change the exit_status or other stuff is unnecessary anymore
+So far we only need these observation, hunting for how the program changes the exit_status or other stuffs is unnecessary anymore
 
-And from that we could reproduce the execution of each child and write a general solver to reverse the transformation and get the input
+And from that we could reproduce the execution of each child and write a general solver to reverse the transformation, recover the input
 
-But there is an inconvenient thing is the `addend[i]` is not only come from the `[0x804190,  0x804197]`, there is a small amount of instruction for each input which hard-coded in the binary used to add additional value for variable, and it is not enough proof to prove it is stored at any specific address so we have to manually reproduce the process to figure out this value by performing a really complicated pattern matching (or it could be more simple but I haven't tried so I don't know)
+But the inconvenient thing is that the `addend[i]` is not only derive from the `[0x804190,  0x804197]`. There is a few instructions for each input byte which hard-coded in the binary used to add additional value. There is not enough proof to prove it is stored at any specific address so we have to manually reproduce the process to figure out this value by performing a really complicated pattern matching (or it could be more simple but I haven't tried so I don't know)
 
-The easier solution is first we still create an interpreter but we will feed a decoy value, then we could calculate the total addend and just from that calculate the target value. The easiest decoy value is input all zero. Because we just need to inspect the transformed value, the total addend will be revealed `transformed[i] = 7 * 0 + addend[i]`
+There is an easier approach. First, we still create an interpreter but then we just need to feed it a decoy input value. Then we could calculate the total addend by performing some mathematical calculations (because we already know the input, and the transformation applied to every input does not change). The simplest decoy value is zero. At the end we can use the transformed data directly, because `transformed[i] = 7 * 0 + addend[i]`
 
 Sorry I could not provide the exact solver script because of dreamhack's rule but these analysis are my raw working process hope you guys like it. If you need any hints or how to write a proper solve script you could contact me. I'm very pleasant to share my works :D 
 
 ---
 
 ### Lesson Learnt
-1. Hmm what should we got here? Well from the fake flag we could see that, any thing that executed before the main could be the choke point for reverse engineering, without clashing with such an equivalent challenge, it would be difficult to figure out the correct path.
+1. Hmm what did we have here? Well from the fake flag we could see that, anything that is executed before main entry point could be the choke point for reverse engineering. Without encountering such an equivalent challenge, it would be more difficult to figure out the correct path.
 
-2. The `memfd_create` create an anonymous file descriptor, it acts exactly the same with normal file descriptor, like we can `read`, `write`, `mmap`, ... But it does not exist in the filesystem (which means disk does not store this). `Fork` create a child process inherited everything from its parent from process, memory, the `PPID` of child will be the program created it. And finally `fexecve` is executing a program from known file descriptor (unlike the `execve` executes program using pathname)
+2. The `memfd_create` function creates an anonymous file descriptor, it acts exactly the same as a normal file descriptor. For example, we can `read`, `write`, and `mmap`, but it does not exist in the filesystem (which means the file is not stored on disk). `Fork` creates a child process inherited everything from its parent from process including its memory. The `PPID` of the child will be the PID of the process created it. And finally `fexecve` is used to execute a program from an existed file descriptor (unlike `execve` which executes program using pathname)
 
-3. Unlike other reverse engineering challenge, this challenge "reverse" part of this fake-branch is kind of simple and easy to do, there is no hard trick, obfuscation, packer, cryptography (well there is XTEA but not hard). Although it is not effortless to reverse it, still need to spend a lot of time to understand but by just reading code we could apprehend
+3. Unlike other reverse challenges, this reversing part of this challenge's fake branch is rather simple and easy to do. There is no hard trick like obfuscation, packer or cryptography (well there is XTEA but not hard). The program is not effortless to reverse, we still need to devote considerable time to catch on the logic
 
-4. There could be other technique related to `ld.so` used to hidden deliberated branch
+4. There could be other techniques related to `ld.so` used to hide deliberated branch
 
-5. If there is a suspicous section with weird permission. For example `WRITE` for uncessary section like Relocation or `RWX` for a random section could be a strong signal
+5. If there is a suspicious section with an abnormal permission. For example `WRITE` for unncessary section such as `.rela` or `RWX` for an abitrary section could be a strong signal to triage
 
-6. To get better at analyzing the virtual machine, we could write disassembler/interpreter and run it with our input, the interpreter is luck based because we're hardly able to manage all the internal logic but the only thing it need to be accurate is `meaning` and `execution branch`. 
+6. To get better at analyzing the virtual machine, we could write a disassembler/interpreter and run it with our input, the interpreter is luck-based because we're hardly able to manage all the internal logic but the only thing it need to be accurate is the `meaning` and the `execution branch`. 
 
-7. Lifting raw disassembled/interpreted script to readable IR version is a goodway to deobfuscate and making pattern more clearly. The proof is me, I was working with the raw version and took almost 15 hours without harvesting any idea, while just 3-4 hours with the lifted IR I could solve the challenge
+7. Lifting raw disassembled/interpreted script to readable IR version is a good approach to deobfuscate and make the pattern clearer. My trial is the proof for this, I was working with the raw version and took almost 15 hours without gaining any useful insight, whereas with the IR one, I solved the challenge in just 3-4 hours
 
 ---
 
-If you see any misunderstand or incorrect part in my writeup, don't hesitate to DM me, I would be very pleasant :D
+If you notice any misleading information or incorrect parts in my writeup, don't hesitate to DM me, I would be very pleased :D

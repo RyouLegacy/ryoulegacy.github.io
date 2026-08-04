@@ -8,23 +8,23 @@ tags: ["Reverse", "Obfuscated", "CTF"]
 
 ## Discussion Crackme9
 
-__Prologue:__ This is just my short discussion about this challenge. I was not able to solve this challenge during the contest (I upsolved it later after searching and reading other player writeup) so I would not confirm this blog is a complete writeup for the whole challenge, just my raw note about this fantasting obfuscator used in this program.
+__Prologue:__ This is just my brief discussion about this challenge. I was not able to solve this challenge during the contest (I upsolved it later after doing some research and reading other player writeups)
 
-Basically the challenge was about to analyze the logic of the serial checker, the binary is obfuscated by the technique called [Nanomites](https://github.com/Fatmike-GH/Nanomites), Dynamic API Resolution, API Hashing with many small anti-debugging and anti-disassembly techniques. I would not dive deeply into how to reverse this binary, my main focus is the obfuscator itself and other interesting anti-reversing technique
+Basically the solution was about to analyze the logic of the serial checker. There are several techniques implemented in the binary such as [Nanomites](https://github.com/Fatmike-GH/Nanomites), Dynamic API Resolution, API Hashing, and many other small anti-debugging and anti-disassembly tricks. I will not dive into how to reverse this binary. My main focus is the obfuscation itself and other interesting anti reverse engineering techniques
 
-Before dive deeply into this challenge, I really appreciate Fatmike for creating such an amazing challenge
+Before dive into this challenge, I really appreciate Fatmike for creating such an amazing challenge
 
 ### Summary
-1. The binary is a serial checker program which validate our serial and feed the correct flag whether our input is correct or not
-2. The secret validating logic is located in the `.pc` section which is encrypted and obfuscated
-3. The checker is using simple and weak hash so we can attempt a brute force measure to get the correct serial
+1. The binary is a serial checker that validates entered key and if it is correct, the flag will be displayed
+2. The secret validation algorithm is located in the `.pc` section which is encrypted and obfuscated
+3. The checker uses a weak hash algorithm, so we can attempt a brute-force attack to get the correct serial
 
 ### Analyze 
-First of all the binary is stripped so it is hard to find any valid program logic's entry point, a suspicious pivot in order to start triaging the challenge function.
+First of all the binary is stripped, so it is hard to spot the correct entry of the encryption routine
 
-However, this program implemented a minimalist GUI with the `OK` confirm button. Moreover, there is also a dialog for typing input. So we can use breakpoint at `GetDlgItemTextA` or `GetDlgItemTextW`, and by inspecting the call stack we can find the serial authentication function
+This program implements a minimalist GUI with an `OK` button. Moreover, there is a dialog for typing input. So we can place a breakpoint at `GetDlgItemTextA` or `GetDlgItemTextW`, and by inspecting the call stack we can find the checker function
 
-We can find the validation function which is at `405399h`
+We can find the validation function at `405399h`
 
 ```c
 int __thiscall sub_405399(int this)
@@ -57,9 +57,9 @@ int __thiscall sub_405399(int this)
 }
 ```
 
-`sub_4030A5` is used to authenticate the serial. It calls the some init function and check the serial in the `.pc` section at `loc_40A000` and `sub_40A025` respectively
+`sub_4030A5` is used to verify the serial. It calls the some init functions in the `.pc` section which are `loc_40A000` and `sub_40A025` respectively
 
-The function at 40112Ch is one of the Dynamic API Resolution/Hashing
+The function at `40112Ch` uses Dynamic API Resolution/Hashing
 ```c
 int __thiscall sub_40112C(void *this, int a2, int a3, int n64, int a5)
 {
@@ -94,14 +94,14 @@ int __thiscall sub_401AD3(int *this)
   return this_1[5];
 }
 ```
-By using Hashdb with unmodified CRC32 algorithm we can find this stands for VirtualProtect
-So the function at `04046C8h` is changing the memory of the PC segment to `PAGE_EXECUTE_READWRITE`
+By using HashDB to look up the CRC32 hash value, we can determine that it is `VirtualProtect`
+So the function at `04046C8h` changes the memory protection attribute of the `pc` section to `PAGE_EXECUTE_READWRITE`
 
-All of important API are dynamically resolved but luckily the list is pretty short so we can manually patch it.
+All of the important APIs are dynamically resolved. Fortunately the list is tiny, so we can manually patch it.
 
-There is a struct object that is used during the whole program which is initialized at `403DD2h`
+There is a struct used throughout execution which is initialized at `403DD2h`
 
-Alright come back to the `4046C8h` function there is a small stub thats cause a breakpoint interruption
+The function at `4046C8h` is used to raise a breakpoint exception
 ```c
 void __thiscall mw_do_breakpoint(_BYTE *this)
 {
@@ -110,13 +110,13 @@ void __thiscall mw_do_breakpoint(_BYTE *this)
 }
 ```
 
-Alright all is what we get while trying to travel follow the program flow, nothing special to inspect anymore. 
+Alright, that is all we can explore while navigating around the binary. Nothing is special to inspect anymore
 
-So if you're trying to manual patch and fix the dynamic api hasing by yourself you would find something really interesting. The challenge implemented the `KiUserExceptionDispatcher` which is a NTDLL native API used for dispatching exception.
+But if you try to recover the hashed API, you will find something really interesting. The challenge uses `KiUserExceptionDispatcher` which is an NTDLL native API, to implement some stuff
 
-Talk more about this a little bit. What I have known so far is this function will resolve and dispatch the exception base on the priority from Windows VEH(Vector Exception Handler through `AddVectoredExceptionHandler`) to SEH(Structured Exception Handler through `__try __catch` stuff), if none of them are implemented the program will crash as a normal behavior. 
+Let's talk more about this API. What I have known is that this function will resolve and dispatch the exception based on the priority, for example from Windows VEH (Vector Exception Handler through `AddVectoredExceptionHandler`) to SEH (Structured Exception Handler through `__try __catch` stuff). If none of them are registered, the program will crash. 
 
-So back to the binary. The KiUserExceptionDispatcher will lie in `040187A`, by examining all its cross reference function you could find this interesting function
+So back to the binary, by examining all the cross-reference assosiated with the `KiUserExceptionDispatcher` function located at `040187A`, you can find this interesting function
 
 ```c
 int __stdcall sub_402E5A(int a1, int a2, int a3, int a4, int a5)
@@ -145,10 +145,9 @@ int __stdcall sub_402E5A(int a1, int a2, int a3, int a4, int a5)
 }
 ```
 
-There is an Anti-debugging technique in the `overwrite_NtQueryInformationProcess` function, by checking the ProcessDebugPort we can just manually patch this to bypass this simple hindering stuff.
+There is an anti-debugging technique in the `overwrite_NtQueryInformationProcess` function using the `ProcessDebugPort` option. We can manually patch this to bypass.
 
-
-So if no debugger is debugging the program it will trigger the `overwrite_the_API` which is a really interesting function.
+So if no debugger exists, the program will trigger the `overwrite_the_API` function which is also a really interesting one
 
 ```c
 void __thiscall overwrite_the_API(_BYTE *this, int custom_seh_handler, int a3)
@@ -183,8 +182,8 @@ void __thiscall overwrite_the_API(_BYTE *this, int custom_seh_handler, int a3)
   }
 }
 ```
-First of all this function used VirtualProtect to change the memory protection of ntdll's text section to PAGE_EXECUTE_READWRITE which is often only READ and WRITE are allowed. After that it used a technique call inline hooking, create a indirect trampoline lead to the custom structured exception handler. 
-It used an assembly PUSH-RET trick to craft the trampoline. The byte 0x68 and 0x3C is translated to PUSH and RET respectively so the very first 6 bytes of this looks like
+First of all, this function uses `VirtualProtect` to change the memory protection of ntdll text section to `PAGE_EXECUTE_READWRITE`. After that, the program uses a technique called inline hooking to create an indirect trampoline led to the custom structured exception handler. 
+The author uses an assembly trick which is `PUSH-RET` to craft the trampoline. The byte 0x68 and 0x3C can be translated to `PUSH` and `RET` respectively, so the epilouge of the function looks like
 ```asm
 PUSH custom_seh_handler
 RET
@@ -212,9 +211,9 @@ void __thiscall mw_exception_handler(obj *this, _EXCEPTION_RECORD *record, _CONT
 }
 ```
 
-Sorry for the inconvenience but I would not dive deep into how am I able to reverse this binary but in general, I was using x32dbg to debug, watching memmory at runtime and guessing the variable function properties and rename it. However there is still some part that I don't understand but the challenge is totally solvable without the comprehensive understanding about the binary
+Sorry for the inconvenience that I would not dive into how I'm able to reverse this part, but in general, I was using x32dbg to debug, watching the memmory at runtime and guessing the function variables properties and rename them. Although, there is still some part that I didn't understand, the challenge is totally solvable
 
-I would anlyze this first, those other exception handler is not much different
+I would analyze this first, those other exception handlers are not much different
 ```c
 int __thiscall exception_breakpoint_handler(obj *this, _CONTEXT *context)
 {
@@ -243,22 +242,20 @@ int __thiscall exception_breakpoint_handler(obj *this, _CONTEXT *context)
 }
 ```
 
-So in the `set_ctxflag` it resets some register variable and activate the Trap Flag for the single step exception handler. 
+So in the `set_ctxflag` function, it resets some register and activates the `Trap Flag` for the single step exception.
 
-The `calc_next_eip` lookups the hardcoded map table to know which`int 3` should be translated to which jcc instruction (you could read the nanomites github for a better explaination)
+`calc_next_eip` looks up the hard-coded mapping table to determine which jcc instruction each `int 3` instruction should be translated to (the nanomites github has a deeper explaination)
 
-The `decrypt_next_eip` decrypts the next 0x10 bytes from the next EIP in the `.pc` section. It used custom constant ChaCha20 algorithm. The key is located at `0x0040D264 + 4`. The key is SHA256 hashed value of the whole `.text` section. So any breakpoint or patching modification will break the value of the key. So my solution to find the key was first open the exe file then using x32dbg to attach and jump to that address, retrieve the key
+The `decrypt_next_eip` function decrypts the next 0x10 bytes from the next EIP in the `.pc` section. It uses a custom ChaCha20 constant. The key is located at `0x0040D264 + 4`, it is a SHA256 hash value of the whole `.text` section. This can be called an anti-tampering technique so that any software breakpoints or modifications like patching to the binary will break the accuracy of the key. Therefore, we can attach the program to the debugger later to extract the key safely 
 
 ```asm
 key = "f630aa38d57297375d645559c334fd50d55ca1d177d2655a042351cf69244bf2"
 nonce = "0a0b0c0d0e0f1011"
 constant = "9e3779b97f4a7c15f39cc0605cedc834"
 ```
+Then we have enough information to decrypt the `pc` section. We can manually patch the section to analyze it statically now
 
-Alright then just manually patch all the pc section by the decrypted value.
-
-Now back to the branch dispatcher function at `404166h`
-
+Now back to the dispatcher function at `404166h`
 ```c
 bool __stdcall check(int a1, _CONTEXT *context)
 {
@@ -339,9 +336,9 @@ LABEL_3:
   return result;
 }
 ```
-The logic is not that hard, it is a little bit lengthy. For example the first one is simulate the `JNE/JNZ` instruction
-You would not have to remember these signature, just googling them
-This is what you get after reversing the function given in the format `(name, short jump, near jump)`
+The logic is not that hard, it is a little bit lengthy. For example, the first one simulates the `JNE/JNZ` instruction
+You do not have to remember these signatures, just googling them
+This is what you get after reversing the function, given in the format `(name, short jump, near jump)`
 
 ```python
 jcc = {
@@ -365,8 +362,8 @@ jcc = {
     18: ('JC', b'\x72', b'\x0F\x82')
 }
 ```
-So the breakpoint interruption will be replaced by one of these jcc instruction. So how does it change? Well remember the 
-hardcoded map table I said above? You can dump this value by looking at the map table initialization at the function lies in `4045A7h`. 
+So `int 3` will be replaced by one of these jcc instructions. So how does it change? Well remember the 
+hard-coded mapping table that I mentioned? You can dump these values by looking into the mapping table initialization located at `4045A7h`. 
 
 ```c
 void __thiscall sub_4045A7(char *this, unsigned int *a2)
@@ -392,12 +389,11 @@ void __thiscall sub_4045A7(char *this, unsigned int *a2)
   }
 }
 ```
-
-The call instruction at `4045DAh` is stl map insert function, 16 bytes from the second argument of the `4045A7h` stub. So the solution was first place a breakpoint at `4045DAh` and follow in dump the value stored in `EDI`
+The call instruction at `4045DAh` is the STL map insert function. Basically, it uses the STL map to store and query data, but we just need data. So the solution was first set up a breakpoint at `4045DAh` and then follow in dump the value stored in `EDI`
 
 ![image](first.png)
 
-So the data is given in the (address offset, type, jump offset, instruction size) format which is 
+So the data is given in the `(address offset, type, jump offset, instruction size)` format which is 
 ```yml
 00 A0 00 00 01 00 00 00 2F 00 00 00 02 00 00 00 
 01 A0 00 00 12 00 00 00 49 00 00 00 02 00 00 00 
@@ -405,25 +401,26 @@ So the data is given in the (address offset, type, jump offset, instruction size
 // truncated 
 ```
 
-Another small technique used in this binary was anti-disassembly. So basically, it looks like
+Another small technique used in this binary is anti-disassembly, it looks like this
 ```asm
 jmp loc+1
 loc:
 // some really meaningless instruction go here
 ```
 
-The jmp instruction directly point to the address of loc+1 which mean the byte at loc is actually junk/garbage byte. But IDA in this situation is disassembling the instruction statically so it does not know this and start translating this useless byte. To fix this, we can nop the junk byte and everything will go fine
+The idea is simple, disassemblers often translate bytecode into assembly in order. So if we insert a junk byte between two instructions and somehow make the runtime skip it (or else we can get crashed). The disassemblers like IDA still translate and get confused. And the solution to make CPU skip that junk byte is the jump instruction. In order to fix dodge this, we can modify all junk bytes into `nop` opcode
 
 So basically challenge's execution flow is:
-> 1. The execution flow initiates with the dynamic generation of ChaCha20 Key, alongside the registeration of a custom SEH
-> 2. The ChaCha20 decryption process of the `.pc` section comes right after our serial key is submitted 
-> 3. The follow execution flow will contain a lot of breakpoint interruption, which will be replaced by the jcc instruction based on the fixed map table
-> 4. The serial has a size of 19 which is hashed into 5 different chunks and compared with fixed values that is initialized at the very first function of the `.pc` section
-> 5. The hash algorithm is pretty simple to crack by just a normal brute-forcing attack because each chunk is isolated with a small size
+>[!NOTE]
+> 1. The execution initiates with the dynamic initialization of the ChaCha20 Key, alongside the registeration of a custom SEH
+> 2. The ChaCha20 decryption process for the `.pc` section comes right after our serial key is submitted 
+> 3. The following execution contains a lot of breakpoint exception, which will be replaced by the jcc instruction
+> 4. The serial has a length of 19 which is hashed into 5 different chunks and compared with fixed values initialized in the first function in the `.pc` section
+> 5. The hash algorithm is pretty simple to crack by just a normal brute-forcing attack
 
-By chaining all the aforementioned pieces, you can deobfuscate this amazing challenge, now is the play of hashing algorithm
+By chaining all the pieces, you can deobfuscate this amazing challenge. Now is the play of hashing algorithm
 
-This is where the 5 different chunk's result hash value be initialized
+This is where the 5 hard-coded constant be initialized
 
 ```c
 serial_obj14 *__thiscall encrypted_stuff(serial_obj14 *this)
@@ -437,7 +434,7 @@ serial_obj14 *__thiscall encrypted_stuff(serial_obj14 *this)
 }
 ```
 
-And the authentication algorithm is 
+And the validatioj algorithm is 
 ```c
 bool __thiscall validate_hash_value(serial_obj14 *obj, char *serial)
 {
@@ -500,8 +497,8 @@ bool __thiscall validate_hash_value(serial_obj14 *obj, char *serial)
 }
 ```
 
-This is basically divide the 19 bytes of the serial into 5 different chunks, each chunk is 4-bytes length then calculate hash of each character consecutively base on the `calc_next_hash` function. Then if all is matched, the serial checker is valid, our flag will appear
-We don't have to understand what the `calc_next_hash` does, we can just manually simulate it in the script by looking really quick through the pseudocode. Then start cracking the hash, this is my solve script
+This function divides the 19 bytes of the serial into 5 different chunks, each chunk has length of 4 bytes. Then it calculates the hash of each character consecutively based on the `calc_next_hash` function. Then if all chunks are matched, the serial checker is valid, our flag will be displayed
+We don't have to understand what the `calc_next_hash` does, we can just manually simulate it in the script by looking real quick through the implementation. Then start attacking the hash, this is my solve script
 
 ```python
 
@@ -665,18 +662,17 @@ for i, opcode in enumerate(decrypted_pc):
     patched_byte += list(insn)
     eip = i + sz
 ```
-There is a problem in this nanomites deobfuscator. There is an special case that cause incorrect translation, for example
+There is a problem in this nanomites deobfuscator. There is a special case that cause an incorrect translation, for example
 ```asm
 0000 .byte 0xCC
 0001 .byte 0x77
 0002 .byte 0xCC
 0003 .byte 0x77
 ```
-If translated instruction at the 0x0 address is a `jump to 0x3`, and if we decrypt the breakpoint at 0x2, it will break the byte at 0x3 led to the wrong disassembled instruction. So I was decided to fix this manully by myself because it doesn't have much case like this but it should have had a better solution like the auto-rev script? I don't know
-
+So basically the issue is exactly similar to the anti-assembly I mentioned above. It is not always a good choice to decrypt a `0xcc` because it could not even be executed during the actual runtime. So if we decrypt every `0xcc` it can affect the nearby bytecode and mess up so many things. For example, if the `0xcc` located at `0000` is decoded into `jmp 0x3`, continuing to decode the following `0xcc` could break the byte at `0003` and ruin the program.
 
 ### End
-I really appreciate the contribution of [Fatmike](https://github.com/Fatmike-GH) in making this such an amazing challenge, it has a very educational knowledge for reverse engineer in particular and all binary analyst in general
-I'm also give a enormous respect to the community as well as some individuals in providing a great explanation and writeup about this challenge, I also learn a lots while reading your guys' blog. Thanks again!
+I really appreciate the contribution of [Fatmike](https://github.com/Fatmike-GH) in making this such an amazing challenge, it has a very educational meaning for reverse engineer in particular and all binary analyst in general
+I'm also give an enormous respect to the community as well as some individuals because they have provided a great explanation and writeup about this challenge. I learnt a lots while reading your guys' blog. Thanks again!
 
-If you have any problems with my discussion you could have a contact with me! Have a good day while reversing ^_^
+If you notice any misleading informations in my blog, you could contact me! Have a good day while reversing ^_^
