@@ -84,7 +84,7 @@ params:
     enabled: True
     title: "Ryou"
     subtitle: "A Rookie Reverse Engineer"
-    imageUrl: "imgs/cattt.png"
+    imageUrl: "imgs/avatar.webp"
     imageTitle: "ryou"
     imageWidth: 150
     imageHeight: 150
