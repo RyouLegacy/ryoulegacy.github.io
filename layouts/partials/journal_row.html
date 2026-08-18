@@ -1,0 +1,30 @@
+{{- $page := .Page -}}
+{{- $showTags := .ShowTags | default false -}}
+{{- if $showTags -}}
+<article class="journal-row journal-row-archive">
+    <h3 class="journal-row-title"><a href="{{ $page.RelPermalink }}">{{ $page.Title | default "Untitled note" }}</a></h3>
+    {{- if not $page.Date.IsZero }}
+    <time class="journal-row-date" datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "02 Jan 2006" }}</time>
+    {{- end }}
+
+    {{- with $page.Params.description }}
+    <p class="journal-row-description">{{ . }}</p>
+    {{- end }}
+
+    {{- if $page.Params.tags }}
+    <ul class="journal-row-tags" aria-label="Tags">
+        {{- range $page.Params.tags }}<li><a href="{{ "tags/" | relLangURL }}{{ . | urlize }}/">#{{ . }}</a></li>{{- end }}
+    </ul>
+    {{- end }}
+</article>
+{{- else -}}
+<article class="journal-row journal-row-latest">
+    <h3 class="journal-row-title"><a href="{{ $page.RelPermalink }}">{{ $page.Title | default "Untitled note" }}</a></h3>
+    {{- if not $page.Date.IsZero }}
+    <time class="journal-row-date" datetime="{{ $page.Date.Format "2006-01-02" }}">{{ $page.Date.Format "02 Jan 2006" }}</time>
+    {{- end }}
+    {{- with $page.Params.description }}
+    <p class="journal-row-description">{{ . }}</p>
+    {{- end }}
+</article>
+{{- end -}}

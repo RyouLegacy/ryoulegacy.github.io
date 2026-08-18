@@ -22,7 +22,7 @@
         </div>
 
         <div class="journal-intro-copy">
-            <h1 class="journal-lede" id="home-title">Reverse engineering, CTFs, and things worth taking apart.</h1>
+            <h1 class="journal-lede" id="home-title">Reverse engineering, CTFs, and weird things</h1>
             <div class="journal-profile-meta">
                 <p class="journal-identity"><strong>{{ .title | default site.Title | markdownify }}</strong><span aria-hidden="true">&middot;</span>{{ .subtitle | markdownify }}</p>
                 <div class="journal-socials" aria-label="Social links">
@@ -36,17 +36,12 @@
     <section class="journal-home-posts" aria-labelledby="latest-posts-title">
         <header class="journal-section-heading">
             <h2 id="latest-posts-title">Latest posts</h2>
-            <a href="{{ "posts/" | relLangURL }}">All posts <span aria-hidden="true">&rarr;</span></a>
+            <a href="{{ "posts/" | relLangURL }}">All posts</a>
         </header>
-        <ol class="journal-home-list">
+        <ol class="journal-rows">
             {{- range $page := $recent -}}
             <li>
-                <article>
-                    <a href="{{ .RelPermalink }}">
-                        <span>{{ .Title }}</span>
-                        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02 Jan 2006" }}</time>
-                    </a>
-                </article>
+                {{- partial "journal_row.html" (dict "Page" $page) -}}
             </li>
             {{- end -}}
         </ol>

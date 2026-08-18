@@ -4,7 +4,7 @@
 <section class="journal-page" aria-labelledby="posts-title">
     <header class="journal-page-heading">
         <h1 id="posts-title">Blogs &amp; writeups</h1>
-        <p>Reverse engineering, pwn, and CTF notes.</p>
+        <p>{{ len .RegularPagesRecursive }} writeups &middot; reverse engineering, pwn, and CTF.</p>
     </header>
 
     {{- if gt (len $paginator.Pages) 0 }}
@@ -12,9 +12,9 @@
         {{- range $group := $paginator.Pages.GroupByDate "2006" }}
         <section class="journal-year" aria-labelledby="year-{{ $group.Key }}">
             <h2 id="year-{{ $group.Key }}">{{ $group.Key }}</h2>
-            <div class="journal-feed">
+            <div class="journal-rows">
                 {{- range $page := $group.Pages }}
-                {{- partial "research_entry.html" $page }}
+                {{- partial "journal_row.html" (dict "Page" $page "ShowTags" true) }}
                 {{- end }}
             </div>
         </section>
@@ -26,9 +26,9 @@
 
     {{- if gt $paginator.TotalPages 1 }}
     <nav class="journal-pagination" aria-label="Posts pagination">
-        <span>{{- if $paginator.HasPrev }}<a rel="prev" href="{{ $paginator.Prev.URL }}"><span aria-hidden="true">&larr;</span> {{ i18n "prev_page" }}</a>{{- end }}</span>
+        <span>{{- if $paginator.HasPrev }}<a rel="prev" href="{{ $paginator.Prev.URL }}">{{ i18n "prev_page" }}</a>{{- end }}</span>
         <span>Page {{ $paginator.PageNumber }} of {{ $paginator.TotalPages }}</span>
-        <span>{{- if $paginator.HasNext }}<a rel="next" href="{{ $paginator.Next.URL }}">{{ i18n "next_page" }} <span aria-hidden="true">&rarr;</span></a>{{- end }}</span>
+        <span>{{- if $paginator.HasNext }}<a rel="next" href="{{ $paginator.Next.URL }}">{{ i18n "next_page" }}</a>{{- end }}</span>
     </nav>
     {{- end }}
 </section>
