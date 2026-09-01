@@ -1344,7 +1344,7 @@ html.dark .post-content blockquote,
 html[data-theme="dark"] .post-content,
 html[data-theme="dark"] .post-content p,
 html[data-theme="dark"] .post-content li {
-    color: #e8e8e8;
+    color: #d1d7df;
 }
 
 /* Post list entry titles */
@@ -1425,7 +1425,7 @@ html[data-theme="dark"] .entry-header h2 {
 :root[data-theme="dark"] {
     --primary: #f7f8fa;
     --secondary: #b8c0ca;
-    --content: #edf1f5;
+    --content: #d1d7df;
     --site-accent: hsl(var(--site-accent-hue) 82% 68%);
     --site-accent-soft: hsl(var(--site-accent-hue) 82% 68% / 12%);
     --research-accent: var(--site-accent);
@@ -2993,16 +2993,16 @@ html:not([data-theme="dark"]) .copy-code {
 .post-content .callout {
     box-sizing: border-box;
     margin: 1.6rem 0;
-    padding: 1rem 1.1rem;
+    padding: 1.05rem 1.25rem;
 
     color: var(--callout-text);
     background: var(--callout-bg);
 
     border: 1px solid var(--callout-border);
-    border-inline-start: 4px solid var(--callout-accent);
-    border-radius: 12px;
+    border-inline-start: 3px solid var(--callout-accent);
+    border-radius: 10px;
 
-    box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+    box-shadow: none;
     overflow-wrap: anywhere;
 }
 
@@ -3024,15 +3024,17 @@ html:not([data-theme="dark"]) .copy-code {
     padding: 0;
 
     color: var(--callout-title);
-    font-size: 1rem;
-    font-weight: 750;
+    font-size: 0.8rem;
+    font-weight: 800;
     line-height: 1.35;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
 }
 
 .post-content .callout-title {
     color: inherit;
     font: inherit;
-    letter-spacing: 0.005em;
+    letter-spacing: inherit;
 }
 
 .post-content .callout-icon {
@@ -3041,8 +3043,8 @@ html:not([data-theme="dark"]) .copy-code {
     justify-content: center;
     flex: 0 0 auto;
 
-    width: 1.35rem;
-    height: 1.35rem;
+    width: 1.15rem;
+    height: 1.15rem;
 
     color: var(--callout-accent);
 }
@@ -3076,7 +3078,7 @@ html:not([data-theme="dark"]) .copy-code {
 }
 
 .post-content .callout .callout-content {
-    line-height: inherit;
+    line-height: 1.7;
 }
 
 .post-content .callout .callout-content > :first-child {
@@ -3224,7 +3226,7 @@ html:not([data-theme="dark"]) .copy-code {
     --callout-bg: #18202b;
     --callout-border: #35445a;
     --callout-title: #90bdf8;
-    --callout-text: #e5eaf0;
+    --callout-text: #d1d7df;
 
     --callout-link: #9bc5ff;
     --callout-link-hover: #c4dcff;
@@ -3240,7 +3242,7 @@ html:not([data-theme="dark"]) .copy-code {
     --callout-bg: #16231e;
     --callout-border: #324a40;
     --callout-title: #82d8af;
-    --callout-text: #e5ede9;
+    --callout-text: #d1d7df;
 
     --callout-link: #8de0b8;
     --callout-link-hover: #b8efd3;
@@ -3256,7 +3258,7 @@ html:not([data-theme="dark"]) .copy-code {
     --callout-bg: #211c2b;
     --callout-border: #493b5e;
     --callout-title: #c5a9f2;
-    --callout-text: #ebe8f0;
+    --callout-text: #d1d7df;
 
     --callout-link: #ceb5f7;
     --callout-link-hover: #e1d2fb;
@@ -3272,7 +3274,7 @@ html:not([data-theme="dark"]) .copy-code {
     --callout-bg: #282116;
     --callout-border: #554727;
     --callout-title: #efc876;
-    --callout-text: #efeae1;
+    --callout-text: #d1d7df;
 
     --callout-link: #f1cd82;
     --callout-link-hover: #f7dfad;
@@ -3288,7 +3290,7 @@ html:not([data-theme="dark"]) .copy-code {
     --callout-bg: #2a1b1e;
     --callout-border: #59353b;
     --callout-title: #f0939d;
-    --callout-text: #f0e8e9;
+    --callout-text: #d1d7df;
 
     --callout-link: #f49da7;
     --callout-link-hover: #f8c2c8;
@@ -3305,11 +3307,11 @@ html:not([data-theme="dark"]) .copy-code {
 @media (max-width: 600px) {
     .post-content .callout {
         margin: 1.35rem 0;
-        padding: 0.9rem 0.95rem;
+        padding: 0.95rem 1rem;
         border-radius: 10px;
     }
 
     .post-content .callout-heading {
-        font-size: 0.96rem;
+        font-size: 0.76rem;
     }
 }
